@@ -48,8 +48,8 @@ contextualized-subtitles/
 
 ## Prerequisites
 
-- Python 3.8+
-- FFmpeg (for media processing)
+- Python ~= 3.10.12
+- FFmpeg ~= 6.1 (for media processing)
 - Required Python packages:
   ```
   pip install -r requirements.txt
@@ -211,4 +211,3 @@ Future improvements planned:
 - Additional STT engine support
 - Enhanced emotion detection
 - Real-time processing capability
-- Multiple la

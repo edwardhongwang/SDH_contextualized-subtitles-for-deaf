@@ -1,0 +1,14 @@
+GOOGLE_API_KEY: ""
+OPENAI_API_KEY: ""
+
+stt:
+  primary_engine: "google"
+  confidence_threshold: 0.85
+
+emotion:
+  detection_enabled: true
+  intensity_threshold: 0.6
+
+sound:
+  description_detail: "detailed"
+  min_volume_threshold: -30
