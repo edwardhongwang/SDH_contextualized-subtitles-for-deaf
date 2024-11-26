@@ -1,0 +1,7 @@
+root:
+  level: DEBUG
+  handlers: [ console ]
+handlers:
+  console:
+    formatter: tiny
+    class: logging.StreamHandler
