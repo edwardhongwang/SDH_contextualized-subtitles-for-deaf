@@ -10,6 +10,7 @@ from utils import extract_audio_from_video
 from utils import setup_logger
 import src.llm as llm
 
+from tests import TestException
 from tests import test_speech_to_text
 
 
@@ -79,7 +80,11 @@ def main(config):
 
     # Testing placeholder
     if args.command == "test":
-        return test_speech_to_text(L)
+        try:
+            return test_speech_to_text(L, config)
+        except TestException as e:
+            L.error(e)
+            return
 
     # Emotion as boolean value
     use_emotion = {
