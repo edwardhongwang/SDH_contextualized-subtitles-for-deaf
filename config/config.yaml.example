@@ -1,8 +1,9 @@
+GOOGLE_API_KEY: ""
+OPENAI_API_KEY: ""
+GROQ_API_KEY: ""
 
 preprocessing: 
   audio_output_format: "wav"
-
-
 
 stt:
   primary_engine: "google"
