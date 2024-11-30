@@ -6,6 +6,7 @@ import logging
 import argparse
 from pathlib import Path
 from utils import setup_logger
+from tests import test_speech_to_text
 
 
 class SubtitlePipeline:
@@ -23,14 +24,23 @@ class SubtitlePipeline:
 
 
 def parse_arguments():
-    parser = argparse.ArgumentParser(description="Video subtitle generator")
+    parser = argparse.ArgumentParser(
+        description="Video subtitle generator", add_help=False
+    )
+    subparsers = parser.add_subparsers(metavar="command", dest="command")
+
+    # Subcommand "test"
+    test_parser = subparsers.add_parser("test", help="Test speech to text")
 
     # Basic usage arguments
-    parser.add_argument(
-        "--input", "-i", help="Input video file", required=True
+    basic_group = parser.add_argument_group("Basic Options")
+    basic_group.add_argument(
+        "--input", "-i", metavar="video",
+        help="Input video file"
     )
-    parser.add_argument(
-        "--output", "-o", default="subtitles.srt", help="Output subtitle file"
+    basic_group.add_argument(
+        "--output", "-o", default="subtitles.srt", metavar="file",
+        help="Output subtitle file"
     )
 
     # Advanced options
@@ -50,13 +60,25 @@ def parse_arguments():
         "--sound-description", choices=sound_set, default="basic",
         help="Sound description level"
     )
-    return parser.parse_args()
+    group.add_argument("--help", "-h", action="help")
+    args = parser.parse_args()
+
+    # Require input iff not testing
+    if args.command != "test" and args.input is None:
+        parser.error("Please provide an --input video file.")
+
+    return args
 
 
 def main(config):
     # Parse arguments
     args = parse_arguments()
     L = logging.getLogger(__name__)
+
+    # Testing placeholder
+    if args.command == "test":
+        return test_speech_to_text(L)
+
     # Emotion as boolean value
     use_emotion = {
         "enabled": True, "disabled": False
