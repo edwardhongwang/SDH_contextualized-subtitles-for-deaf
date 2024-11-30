@@ -6,6 +6,7 @@ import logging
 import argparse
 from pathlib import Path
 from utils import setup_logger
+from tests import TestException
 from tests import test_speech_to_text
 
 
@@ -77,7 +78,11 @@ def main(config):
 
     # Testing placeholder
     if args.command == "test":
-        return test_speech_to_text(L)
+        try:
+            return test_speech_to_text(L, config)
+        except TestException as e:
+            L.error(e)
+            return
 
     # Emotion as boolean value
     use_emotion = {
