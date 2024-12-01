@@ -1,2 +1,0 @@
-PyYAML==6.0.2
-pycodestyle==2.12.1
