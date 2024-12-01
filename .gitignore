@@ -8,3 +8,7 @@ deepgram-python-captions/
 
 
 *.mp4
+venv/
+*.dylib
+data/**/*.wav
+venv/
