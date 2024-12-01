@@ -40,7 +40,7 @@ contextualized-subtitles/
 │   ├── sound_description.py  # Non-speech sounds
 │   └── subtitle_generator.py # Final generation
 ├── tests/
-│   ├── test_data/           # Test files
+│   ├── audio/               # Test audio
 │   └── test_modules.py      # Test cases
 ├── utils.py                 # Utilities
 └── main.py                 # Entry point
@@ -85,6 +85,12 @@ contextualized-subtitles/
 
 ```bash
 python main.py --input video.mp4 --output subtitles.srt
+```
+
+### Testing
+
+```bash
+python main.py test
 ```
 
 ### Advanced Options
