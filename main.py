@@ -12,6 +12,8 @@ import src.llm as llm
 
 from tests import TestException
 from tests import test_speech_to_text
+from src import SpeechTranscriber
+from src import groq_audio_api
 
 
 
@@ -24,6 +26,9 @@ audio_path = utils.extract_audio_from_video(video_path)
 
 # Speech-to-text
 transcript_path = deepgram_STT.speech_to_text(audio_path)
+
+# proofread transcript
+proofread_transcript_path = llm.proofread(transcript_path)
 
 
 def parse_arguments():
@@ -81,7 +86,9 @@ def main(config):
     # Testing placeholder
     if args.command == "test":
         try:
-            return test_speech_to_text(L, config)
+            return test_speech_to_text(
+                groq_audio_api, config
+            )
         except TestException as e:
             L.error(e)
             return
@@ -91,7 +98,41 @@ def main(config):
         "enabled": True, "disabled": False
     }.get(args.emotion_detection, None)
     assert use_emotion in {True, False}
+    assert Path(args.input).exists()
+
+    # TODO: print unused arguments
+    if (args.stt_engine):
+        L.warning(f"Ignoring STT Engine: {args.stt_engine}")
+    if (use_emotion):
+        L.warning(f"Ignoring Emotion Detection: {use_emotion}")
+    if (args.sound_description):
+        L.warning(f"Ignoring Sound Description: {args.sound_description}")
+
+    # Run speech transcriber ( Groq API )
+    transcriber = SpeechTranscriber(config)
+    transcribed = transcriber.transcribe(args.input)
+    with open(args.output, 'w') as wf:
+        wf.write(transcribed)
 
 
-# proofread transcript
-proofread_transcript_path = llm.proofread(transcript_path)
+if __name__ == "__main__":
+    config_folder = Path('config')
+    setup_logger(config_folder)
+    L = logging.getLogger(__name__)
+    config = None
+    # Parse config file
+    try:
+        config = yaml.safe_load(
+            open(config_folder / "config.yaml")
+        )
+    except FileNotFoundError:
+        L.error("Missing configuration file")
+        L.info(
+            "Hint\ncp config/config.yaml.example config/config.yaml"
+        )
+    if config is not None:
+        # Run pipeline
+        main(config)
+        L.info("Done")
+    else:
+        L.warning("Aborting")
