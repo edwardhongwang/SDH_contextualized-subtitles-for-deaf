@@ -12,3 +12,6 @@ venv/
 *.dylib
 data/**/*.wav
 venv/
+*.wav
+*.dylib
+venv/
