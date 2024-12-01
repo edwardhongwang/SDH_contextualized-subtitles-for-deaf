@@ -18,23 +18,29 @@ def setup_logger(config_folder=None):
     # Configure logging
     logging.config.dictConfig({
         "version": 1,
-        "root":{
-            "handlers" : ["console"],
+        "root": {
+            "handlers": ["console"],
             "level": "WARNING"
         },
-        "handlers":{
-            "console":{
+        "handlers": {
+            "console": {
                 "formatter": "full",
                 "class": "logging.StreamHandler"
             }
         },
-        "formatters":{
+        "formatters": {
             "full": {
-                "datefmt":"%d-%m-%Y %I:%M:%S",
-                "format": "%(levelname)s : %(asctime)s : %(module)s : %(funcName)s : %(lineno)d -- %(message)s",
+                "datefmt": "%d-%m-%Y %I:%M:%S",
+                "format": (
+                    "%(levelname)s : %(asctime)s : %(module)s : "
+                    "%(funcName)s : %(lineno)d -- %(message)s"
+                )
             },
             "short": {
-                "format": "%(levelname)s : %(module)s : %(funcName)s -- %(message)s"
+                "format": (
+                    "%(levelname)s : %(module)s : "
+                    "%(funcName)s -- %(message)s"
+                )
             },
             "tiny": {
                 "format": "%(levelname)s -- %(message)s"

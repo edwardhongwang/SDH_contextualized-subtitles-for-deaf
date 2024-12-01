@@ -5,3 +5,4 @@ __pycache__/
 *.log
 .DS_Store
 config/config.yaml
+subtitles.srt

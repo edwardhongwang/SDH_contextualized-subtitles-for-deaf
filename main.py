@@ -8,6 +8,8 @@ from pathlib import Path
 from utils import setup_logger
 from tests import TestException
 from tests import test_speech_to_text
+from src import SpeechTranscriber
+from src import groq_audio_api
 
 
 class SubtitlePipeline:
@@ -79,7 +81,9 @@ def main(config):
     # Testing placeholder
     if args.command == "test":
         try:
-            return test_speech_to_text(L, config)
+            return test_speech_to_text(
+                groq_audio_api, config
+            )
         except TestException as e:
             L.error(e)
             return
@@ -89,13 +93,21 @@ def main(config):
         "enabled": True, "disabled": False
     }.get(args.emotion_detection, None)
     assert use_emotion in {True, False}
+    assert Path(args.input).exists()
 
-    # Print arguments
-    L.info(f"Input: {args.input}")
-    L.info(f"Output: {args.output}")
-    L.info(f"STT Engine: {args.stt_engine}")
-    L.info(f"Emotion Detection: {use_emotion}")
-    L.info(f"Sound Description: {args.sound_description}")
+    # TODO: print unused arguments
+    if (args.stt_engine):
+        L.warning(f"Ignoring STT Engine: {args.stt_engine}")
+    if (use_emotion):
+        L.warning(f"Ignoring Emotion Detection: {use_emotion}")
+    if (args.sound_description):
+        L.warning(f"Ignoring Sound Description: {args.sound_description}")
+
+    # Run speech transcriber ( Groq API )
+    transcriber = SpeechTranscriber(config)
+    transcribed = transcriber.transcribe(args.input)
+    with open(args.output, 'w') as wf:
+        wf.write(transcribed)
 
 
 if __name__ == "__main__":
@@ -109,7 +121,7 @@ if __name__ == "__main__":
             open(config_folder / "config.yaml")
         )
     except FileNotFoundError:
-        L.error("Missing configuration file");
+        L.error("Missing configuration file")
         L.info(
             "Hint\ncp config/config.yaml.example config/config.yaml"
         )
