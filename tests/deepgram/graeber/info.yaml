@@ -1,0 +1,32 @@
+source: https://upload.wikimedia.org/wikipedia/commons/1/16/David_Graeber_-_voice_-_en.mp3
+license: https://creativecommons.org/publicdomain/zero/1.0/
+speaker: https://www.wikidata.org/wiki/Q1174579
+label: the voice of David Graeber
+expected: |-
+  1
+  00:00:00,160 --> 00:00:03,360
+  My name is David Graeber. I'm currently a
+
+  2
+  00:00:03,360 --> 00:00:05,840
+  professor of anthropology at the London School of
+
+  3
+  00:00:05,840 --> 00:00:06,340
+  Economics.
+
+  4
+  00:00:07,602 --> 00:00:10,422
+  Written a bunch of books. The first 5000
+
+  5
+  00:00:10,722 --> 00:00:12,402
+  years is probably the most famous.
+
+  6
+  00:00:13,042 --> 00:00:15,762
+  This year, 2018, I have produced a book
+
+  7
+  00:00:15,762 --> 00:00:17,782
+  called Bullshit Jobs, A Theory.

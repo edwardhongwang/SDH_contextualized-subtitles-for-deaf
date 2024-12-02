@@ -33,17 +33,12 @@ contextualized-subtitles/
 ├── config/
 │   └── config.yaml           # Configuration settings
 ├── src/
-│   ├── preprocessor.py       # Media preprocessing
-│   ├── speech_to_text.py     # Speech transcription
-│   ├── subtitle_format.py    # Subtitle formatting
-│   ├── emotion_context.py    # Emotion analysis
-│   ├── sound_description.py  # Non-speech sounds
-│   └── subtitle_generator.py # Final generation
 ├── tests/
 │   ├── audio/               # Test audio
 │   └── test_modules.py      # Test cases
 ├── utils.py                 # Utilities
-└── main.py                 # Entry point
+└── main.py                  # Entry point
+└── .env                     # API keys
 ```
 
 ## Prerequisites
@@ -55,8 +50,10 @@ contextualized-subtitles/
   pip install -r requirements.txt
   ```
 
-- API Keys (add to config/config.yaml):
+- API Keys (add to .env):
   - Google Cloud Speech-to-Text API
+  - Deepgram Speech-to-Text API
+  - Groq Speech-to-Text API
   - OpenAI API (for Whisper)
   - Any additional APIs for emotion detection
 
@@ -75,8 +72,8 @@ contextualized-subtitles/
 
 3. Configure API keys:
    ```bash
-   cp config/config.yaml.example config/config.yaml
-   # Edit config.yaml with your API keys
+   cp .env.example .env
+   # Edit .env with your API keys
    ```
 
 ## Usage
@@ -87,7 +84,11 @@ contextualized-subtitles/
 python main.py --input video.mp4 --output subtitles.srt
 ```
 
-### Testing
+```bash
+python main.py --input video.mp3 --output subtitles.srt
+```
+
+### Running Tests
 
 ```bash
 python main.py test
@@ -149,7 +150,7 @@ The generator produces subtitles in standard SRT format with enhanced context:
 ### Running Tests
 
 ```bash
-python -m pytest tests/test_modules.py
+python main.py test
 ```
 
 ### Adding New Features

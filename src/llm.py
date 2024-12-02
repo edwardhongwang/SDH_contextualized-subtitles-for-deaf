@@ -1,16 +1,9 @@
 import openai
-import os
-import dotenv
+from .errors import APIError
 
-dotenv.load_dotenv()
 
-openai.api_key = os.getenv('OPENAI_API_KEY')
-
-def proofread(transcript_path):
-    # Read the entire SRT file
-    with open(transcript_path, 'r', encoding='utf-8') as f:
-        srt_content = f.read()
-
+def proofread(api_key, model, srt_content):
+    openai.api_key = api_key 
     # Prepare the system prompt
     system_prompt = (
         "You are a professional proofreader and editor specializing in transcripts formatted in SRT (SubRip Subtitle) files. "
@@ -138,13 +131,11 @@ Please proceed to apply these guidelines to the transcript below, ensuring that 
         + srt_content
     )
 
-
-
     client = openai.OpenAI(api_key=openai.api_key)
     # Proceed with the API call
     try:
         response = client.chat.completions.create(
-            model="o1-preview-2024-09-12",  
+            model=model,  
             messages=[
                 
                 {"role": "user", "content": system_prompt + "\n\n" + prompt},
@@ -153,24 +144,22 @@ Please proceed to apply these guidelines to the transcript below, ensuring that 
 
         # Get the edited transcript
         edited_srt_content = response.choices[0].message.content
-
-        # Determine the output path
-        transcript_dir = os.path.dirname(transcript_path)
-        transcript_filename = os.path.basename(transcript_path)
-        proofread_filename = f"proofread_{transcript_filename}"
-        proofread_transcript_path = os.path.join(transcript_dir, proofread_filename)
-
-        # Save the edited transcript
-        with open(proofread_transcript_path, 'w', encoding='utf-8') as f:
-            f.write(edited_srt_content)
-
-        # Return the output file path
-        return proofread_transcript_path
-
+        return remove_any_prefix(edited_srt_content)
     except openai.OpenAIError as e:
-        print(f"OpenAI API error: {e}")
-        return None
+        raise APIError("OpenAI Error") from e
 
-if __name__ == "__main__":
-    proofread_transcript_path = proofread("data/OceanXplorers Giants of the Deep with James Cameron Full Episode  National Geographic_1QeMXEm-BNQ/transcript_nova-2_audio_OceanXplorers Giants of the Deep with James Cameron Full Episode  National Geographic_1QeMXEm-BNQ.srt")
-    print(proofread_transcript_path)
+
+def remove_any_prefix(edited_srt_content):
+    '''
+        Remove any prefix e.g. **Corrected Transcript:**
+        Return string is expected to be valid SRT
+    '''
+    trimmed_lines = 0
+    max_trimmed_lines = 10
+    while (edited_srt_content[:2] != "1\n"):
+        trimmed_lines += 1
+        if trimmed_lines > max_trimmed_lines:
+            break
+        lines = edited_srt_content.split('\n')
+        edited_srt_content = '\n'.join(lines[1:])
+    return edited_srt_content

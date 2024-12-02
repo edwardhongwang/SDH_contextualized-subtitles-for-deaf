@@ -4,7 +4,6 @@ __pycache__/
 .venv/
 *.log
 .DS_Store
-config/config.yaml
 deepgram-python-captions/
 
 *.mp4
@@ -17,3 +16,8 @@ data/**/*
 !data/**/*.srt
 # Except for test data
 !data/test/*.mp3
+# Ignore logfiles
+tests/debug.*
+tests/error.*
+# Ignore integration test artefacts
+tests/integration/**/*.srt

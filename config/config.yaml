@@ -1,0 +1,22 @@
+deepgram:
+  model: nova-2
+
+openai:
+  model: o1-mini
+
+groq:
+  temperature: 0
+  model: distil-whisper-large-v3-en
+
+stt:
+  primary_engine: "deepgram"
+
+# TODO
+emotion:
+  detection_enabled: true
+  intensity_threshold: 0.6
+
+# TODO
+sound:
+  description_detail: "detailed"
+  min_volume_threshold: -30

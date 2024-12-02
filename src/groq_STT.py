@@ -7,7 +7,7 @@ from pathlib import Path
 
 def groq_audio_api(
     groq_key, model, audio_path,
-    lang="en", temp=0
+    lang="en", temperature=0
 ):
     ext = Path(audio_path).suffix
     groq_url = (
@@ -27,7 +27,7 @@ def groq_audio_api(
         'file': file,
         'model': (None, model),
         'language': (None, lang),
-        'temperature': (None, temp),
+        'temperature': (None, temperature),
         'response_format': (None, 'json'),
     }
     try:
@@ -35,12 +35,12 @@ def groq_audio_api(
             endpoint, headers=headers, files=files
         )
     except requests.exceptions.ConnectionError:
-        raise TestException(
+        raise Exception(
             "Unable to contact API server"
         ) from None
     try:
         return response.json()
     except requests.exceptions.JSONDecodeError:
-        raise TestException(
+        raise Exception(
             "Invalid JSON Response from server"
         ) from None

@@ -3,5 +3,5 @@ root:
   handlers: [ console ]
 handlers:
   console:
-    formatter: tiny 
+    formatter: short
     class: logging.StreamHandler

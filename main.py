@@ -1,44 +1,30 @@
 """
 Main entry point for the subtitle generation system.
 """
-import yaml
 import logging
 import argparse
 from pathlib import Path
-import src.deepgram_STT as deepgram_STT
+from utils import log_format, log_date 
 from utils import extract_audio_from_video
-from utils import setup_logger
-import src.llm as llm
+from utils import setup_logger, load_config
 
-from tests import TestException
-from tests import test_speech_to_text
-from src import SpeechTranscriber
-from src import groq_audio_api
+from src import audio_path_to_transcript_path
+from src import create_output_transcript_path
+from src import main
+import pytest
 
-
-
-video_path = "data/Best Joker Scenes in The Dark Knight _ Max/Best Joker Scenes in The Dark Knight _ Max.mp4"
-
-### video can be downloaded from youtube using src.download.py
-
-# Extract audio from video
-audio_path = utils.extract_audio_from_video(video_path)
-
-# Speech-to-text
-transcript_path = deepgram_STT.speech_to_text(audio_path)
-
-# proofread transcript
-proofread_transcript_path = llm.proofread(transcript_path)
+# video_path = "data/Best Joker Scenes in The Dark Knight _ Max/Best Joker Scenes in The Dark Knight _ Max.mp4"
 
 
-def parse_arguments():
+def parse_arguments(test_commands):
     parser = argparse.ArgumentParser(
         description="Video subtitle generator", add_help=False
     )
     subparsers = parser.add_subparsers(metavar="command", dest="command")
 
     # Subcommand "test"
-    test_parser = subparsers.add_parser("test", help="Test speech to text")
+    for cmd in test_commands:
+        subparsers.add_parser(cmd, help="Run pytest")
 
     # Basic usage arguments
     basic_group = parser.add_argument_group("Basic Options")
@@ -47,17 +33,17 @@ def parse_arguments():
         help="Input video file"
     )
     basic_group.add_argument(
-        "--output", "-o", default="subtitles.srt", metavar="file",
+        "--output", "-o", metavar="file",
         help="Output subtitle file"
     )
 
     # Advanced options
-    stt_set = {"whisper", "google"}
+    stt_set = {"deepgram", "groq" }
     sound_set = {"basic", "detailed"}
     emotion_set = {"disabled", "enabled"}
     group = parser.add_argument_group("Advanced Options")
     group.add_argument(
-        "--stt-engine", choices=stt_set, default="whisper",
+        "--stt-engine", choices=stt_set, default="deepgram",
         help="Speech-to-text engine"
     )
     group.add_argument(
@@ -72,67 +58,77 @@ def parse_arguments():
     args = parser.parse_args()
 
     # Require input iff not testing
-    if args.command != "test" and args.input is None:
-        parser.error("Please provide an --input video file.")
+    if args.input is None:
+        if args.command not in test_commands:
+            parser.error("Please provide an --input video file.")
 
     return args
 
 
-def main(config):
+def run_main(config):
     # Parse arguments
-    args = parse_arguments()
+    test_commands = "test","tests"
+    args = parse_arguments(test_commands)
     L = logging.getLogger(__name__)
 
-    # Testing placeholder
-    if args.command == "test":
-        try:
-            return test_speech_to_text(
-                groq_audio_api, config
-            )
-        except TestException as e:
-            L.error(e)
-            return
+    # Testing
+    if args.command in test_commands:
+        full_format = log_format('full')
+        full_date = log_date('full')
+        return pytest.main([
+            "-x", # stop at first error
+            "-rA", # print all output
+            "--assert=plain",
+            "--log-cli-level=INFO",
+            f'--log-format={full_format}',
+            f'--log-date-format={full_date}',
+            "tests"
+        ])
+
+    try:
+        audio_path = ensure_audio_input(args)
+    except ValueError:
+        L.error(f'Issue reading {args.input}')
+        return
 
     # Emotion as boolean value
     use_emotion = {
         "enabled": True, "disabled": False
     }.get(args.emotion_detection, None)
     assert use_emotion in {True, False}
-    assert Path(args.input).exists()
+    assert Path(audio_path).exists()
 
-    # TODO: print unused arguments
-    if (args.stt_engine):
-        L.warning(f"Ignoring STT Engine: {args.stt_engine}")
+    # TODO: unused arguments
     if (use_emotion):
         L.warning(f"Ignoring Emotion Detection: {use_emotion}")
     if (args.sound_description):
         L.warning(f"Ignoring Sound Description: {args.sound_description}")
 
-    # Run speech transcriber ( Groq API )
-    transcriber = SpeechTranscriber(config)
-    transcribed = transcriber.transcribe(args.input)
-    with open(args.output, 'w') as wf:
-        wf.write(transcribed)
+    transcript_path = create_output_transcript_path(
+        args.output, audio_path, args.stt_engine
+    )
+    main(
+        L, config, audio_path, transcript_path,
+        stt_engine=args.stt_engine
+    )
+
+
+def ensure_audio_input(args):
+    ext = Path(args.input).suffix
+    audio = {'mp3'}
+    return args.input if ext in audio else (
+        extract_audio_from_video(args.input)
+    )
 
 
 if __name__ == "__main__":
     config_folder = Path('config')
     setup_logger(config_folder)
     L = logging.getLogger(__name__)
-    config = None
-    # Parse config file
-    try:
-        config = yaml.safe_load(
-            open(config_folder / "config.yaml")
-        )
-    except FileNotFoundError:
-        L.error("Missing configuration file")
-        L.info(
-            "Hint\ncp config/config.yaml.example config/config.yaml"
-        )
+    config = load_config(L, config_folder)
     if config is not None:
         # Run pipeline
-        main(config)
+        run_main(config)
         L.info("Done")
     else:
         L.warning("Aborting")
