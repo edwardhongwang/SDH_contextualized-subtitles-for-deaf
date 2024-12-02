@@ -88,7 +88,7 @@ python main.py --input video.mp4 --output subtitles.srt
 ```
 
 ```bash
-python main.py --input video.mp3 --output subtitles.srt
+python main.py --input audio.mp3 --output subtitles.srt
 ```
 
 ### Running Tests
