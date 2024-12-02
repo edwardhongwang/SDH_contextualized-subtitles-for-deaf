@@ -1,0 +1,23 @@
+root:
+  level: DEBUG
+  propagate: True
+  handlers: [ debug_log, error_log ]
+handlers:
+  debug_log:
+    class: logging.handlers.TimedRotatingFileHandler
+    level: DEBUG 
+    formatter: tiny 
+    filename: tests/debug.log
+    backupCount: 5
+    encoding: utf8
+    interval: 1
+    when: S
+  error_log:
+    class: logging.handlers.TimedRotatingFileHandler
+    level: ERROR
+    formatter: full
+    filename: tests/error.log
+    backupCount: 5
+    encoding: utf8
+    interval: 1
+    when: S

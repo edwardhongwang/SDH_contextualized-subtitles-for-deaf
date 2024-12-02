@@ -19,28 +19,17 @@ def setup_logger(config_folder=None):
     # Configure logging
     logging.config.dictConfig({
         "version": 1,
-        "root":{
-            "handlers" : ["console"],
+        "root": {
+            "handlers": ["console"],
             "level": "WARNING"
         },
-        "handlers":{
-            "console":{
+        "handlers": {
+            "console": {
                 "formatter": "full",
                 "class": "logging.StreamHandler"
             }
         },
-        "formatters":{
-            "full": {
-                "datefmt":"%d-%m-%Y %I:%M:%S",
-                "format": "%(levelname)s : %(asctime)s : %(module)s : %(funcName)s : %(lineno)d -- %(message)s",
-            },
-            "short": {
-                "format": "%(levelname)s : %(module)s : %(funcName)s -- %(message)s"
-            },
-            "tiny": {
-                "format": "%(levelname)s -- %(message)s"
-            }
-        },
+        "formatters": log_options(),
         **config
     })
     logging.root.setLevel(
@@ -48,10 +37,34 @@ def setup_logger(config_folder=None):
     )
 
 
-# Performance monitoring
-def monitor_performance(func):
-    # Decorator for performance tracking
-    pass
+def log_options():
+    return {
+        "full": {
+            "datefmt": "%Y-%m-%d_%H:%M:%S",
+            "format": (
+                "%(levelname)s : %(asctime)s : %(module)s : "
+                "%(funcName)s : %(lineno)d -- %(message)s"
+            )
+        },
+        "short": {
+            "format": (
+                "%(levelname)s : %(module)s : "
+                "%(funcName)s -- %(message)s"
+            )
+        },
+        "tiny": {
+            "format": "%(levelname)s -- %(message)s"
+        }
+    }
+
+
+def log_format(key):
+    return log_options()[key]['format']
+
+
+def log_date(key):
+    return log_options()[key]['datefmt']
+
 
 # Audio extraction
 def extract_audio_from_video(video_path):
@@ -109,3 +122,15 @@ def extract_audio_from_video(video_path):
 
     return audio_path
 
+
+def load_config(L, config_folder):
+    # Parse config file
+    try:
+        return yaml.safe_load(
+            open(config_folder / "config.yaml")
+        )
+    except FileNotFoundError:
+        L.error("Missing configuration file")
+        L.info(
+            "Hint\ncp .env.example .env"
+        )

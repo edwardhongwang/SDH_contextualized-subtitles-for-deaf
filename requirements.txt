@@ -1,0 +1,8 @@
+PyYAML==6.0.2
+pycodestyle==2.12.1
+requests==2.32.3
+deepgram-sdk==3.7.7
+deepgram-captions==1.2.0
+pytest==8.3.4
+openai==1.55.3
+srt==3.5.3
