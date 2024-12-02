@@ -102,7 +102,7 @@ def test_similarity_metric():
     )
 
 
-def _test_openai(min_similarity, min_line_ratio):
+def test_openai(min_similarity, min_line_ratio):
     L, config = setup()
     for input_path, info in find_test_files("openai", "input.srt"):
         label = info.get('label', input_path)
@@ -129,7 +129,7 @@ def _test_openai(min_similarity, min_line_ratio):
             L.debug('\n'.join(ndiff(expected, result)))
 
 
-def _test_deepgram():
+def test_deepgram():
     L, config = setup()
     for input_path, info in find_test_files("deepgram", "voice.mp3"):
         label = info.get('label', input_path)
@@ -152,7 +152,7 @@ def _test_deepgram():
             assert False
 
 
-def _test_groq():
+def test_groq():
     L, config = setup()
     for input_path, info in find_test_files("groq", "voice.mp3"):
         label = info.get('label', input_path)
