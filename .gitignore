@@ -4,14 +4,16 @@ __pycache__/
 .venv/
 *.log
 .DS_Store
+config/config.yaml
 deepgram-python-captions/
-
 
 *.mp4
 venv/
-*.dylib
-data/**/*.wav
-venv/
 *.wav
 *.dylib
-venv/
+# Ignore files in data
+data/**/*
+# Except for subtitles
+!data/**/*.srt
+# Except for test data
+!data/test/*.mp3
