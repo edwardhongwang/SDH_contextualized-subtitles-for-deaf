@@ -34,7 +34,10 @@ contextualized-subtitles/
 │   └── config.yaml           # Configuration settings
 ├── src/
 ├── tests/
-│   ├── audio/               # Test audio
+│   ├── groq/
+│   ├── openai/
+│   ├── deepgram/
+│   ├── integration/
 │   └── test_modules.py      # Test cases
 ├── utils.py                 # Utilities
 └── main.py                  # Entry point
