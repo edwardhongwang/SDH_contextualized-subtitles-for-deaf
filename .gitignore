@@ -14,10 +14,8 @@ venv/
 data/**/*
 # Except for subtitles
 !data/**/*.srt
-# Except for test data
-!data/test/*.mp3
 # Ignore logfiles
 tests/debug.*
 tests/error.*
-# Ignore integration test artefacts
+# Ignore integration artefacts
 tests/integration/**/*.srt
