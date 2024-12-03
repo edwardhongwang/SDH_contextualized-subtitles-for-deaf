@@ -1,7 +1,10 @@
 """
 Utility functions and helper methods.
 """
+from contextlib import redirect_stdout
+from os import devnull
 import yaml
+import pytest
 import logging
 import logging.config
 import glob
@@ -121,6 +124,47 @@ def extract_audio_from_video(video_path):
     subprocess.run(command, check=True)
 
     return audio_path
+
+
+def silence(func):
+    def wrapper():
+        with redirect_stdout(open(devnull, 'w')):
+            return func()
+    return wrapper
+
+
+@silence
+def find_test_sets(test_sets=set()):
+
+    class Find:
+        def pytest_collection_modifyitems(self, items):
+            nonlocal test_sets
+            test_sets = test_sets.union(
+                m for i in items
+                for m in i.config._getini('markers')
+            )
+
+    pytest.main(
+        ["--collect-only", "--assert=plain", "tests"],
+        plugins=[Find()]
+    )
+    return sorted(test_sets)
+
+
+def run_tests(test_sets):
+    full_format = log_format('full')
+    full_date = log_date('full')
+    return pytest.main([
+        "-x",  # stop at first error
+        "-rA",  # print all output
+        "--assert=plain",
+        "--log-cli-level=INFO",
+        f'--log-format={full_format}',
+        f'--log-date-format={full_date}',
+        "tests"
+    ] + ([] if "*" in test_sets else [
+        "-m", " or ".join(test_sets)
+    ]))
 
 
 def load_config(L, config_folder):

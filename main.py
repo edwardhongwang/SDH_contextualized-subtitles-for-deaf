@@ -4,27 +4,29 @@ Main entry point for the subtitle generation system.
 import logging
 import argparse
 from pathlib import Path
-from utils import log_format, log_date 
+from utils import find_test_sets, run_tests
 from utils import extract_audio_from_video
 from utils import setup_logger, load_config
 
 from src import audio_path_to_transcript_path
 from src import create_output_transcript_path
 from src import main
-import pytest
-
-# video_path = "data/Best Joker Scenes in The Dark Knight _ Max/Best Joker Scenes in The Dark Knight _ Max.mp4"
 
 
-def parse_arguments(test_commands):
+def parse_arguments(L, config, test_commands):
     parser = argparse.ArgumentParser(
         description="Video subtitle generator", add_help=False
     )
     subparsers = parser.add_subparsers(metavar="command", dest="command")
 
     # Subcommand "test"
+    test_list = find_test_sets()
     for cmd in test_commands:
-        subparsers.add_parser(cmd, help="Run pytest")
+        test_str = ", ".join(test_list)
+        subparsers.add_parser(cmd, help=test_str).add_argument(
+            "test_sets", metavar="test sets", nargs='*', default="*",
+            choices=test_list+["*"], help=test_str
+        )
 
     # Basic usage arguments
     basic_group = parser.add_argument_group("Basic Options")
@@ -38,12 +40,14 @@ def parse_arguments(test_commands):
     )
 
     # Advanced options
-    stt_set = {"deepgram", "groq" }
+    stt_set = {"deepgram", "groq"}
     sound_set = {"basic", "detailed"}
     emotion_set = {"disabled", "enabled"}
+    stt_default_default = "deepgram"
+    stt_default = config.get('stt', {})['primary_engine']
     group = parser.add_argument_group("Advanced Options")
     group.add_argument(
-        "--stt-engine", choices=stt_set, default="deepgram",
+        "--stt-engine", choices=stt_set, default=stt_default,
         help="Speech-to-text engine"
     )
     group.add_argument(
@@ -57,6 +61,14 @@ def parse_arguments(test_commands):
     group.add_argument("--help", "-h", action="help")
     args = parser.parse_args()
 
+    # Ensure valid STT engine
+    if stt_default not in stt_set:
+        L.warning(
+            f'Unknown stt engine "{stt_default}" found in config. '
+            f'Defaulting instead to "{stt_default_default}"'
+        )
+        stt_default = stt_default_default
+
     # Require input iff not testing
     if args.input is None:
         if args.command not in test_commands:
@@ -67,24 +79,13 @@ def parse_arguments(test_commands):
 
 def run_main(config):
     # Parse arguments
-    test_commands = "test","tests"
-    args = parse_arguments(test_commands)
+    test_commands = "test", "tests"
     L = logging.getLogger(__name__)
+    args = parse_arguments(L, config, test_commands)
 
     # Testing
     if args.command in test_commands:
-        full_format = log_format('full')
-        full_date = log_date('full')
-        return pytest.main([
-            "-x", # stop at first error
-            "-rA", # print all output
-            "--assert=plain",
-            "--log-cli-level=INFO",
-            f'--log-format={full_format}',
-            f'--log-date-format={full_date}',
-            "tests"
-        ])
-
+        return run_tests(args.test_sets)
     try:
         audio_path = ensure_audio_input(args)
     except ValueError:

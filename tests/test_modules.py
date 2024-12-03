@@ -79,6 +79,7 @@ def similarity_metric(
     )/n_unique_lines
 
 
+@pytest.mark.fast
 def test_similarity_metric():
     # 60% of lines are similar
     assert .6 == similarity_metric(
@@ -102,6 +103,7 @@ def test_similarity_metric():
     )
 
 
+@pytest.mark.llm
 def test_openai(min_similarity, min_line_ratio):
     L, config = setup()
     for input_path, info in find_test_files("openai", "input.srt"):
@@ -129,6 +131,8 @@ def test_openai(min_similarity, min_line_ratio):
             L.debug('\n'.join(ndiff(expected, result)))
 
 
+@pytest.mark.stt
+@pytest.mark.fast
 def test_deepgram():
     L, config = setup()
     for input_path, info in find_test_files("deepgram", "voice.mp3"):
@@ -152,6 +156,8 @@ def test_deepgram():
             assert False
 
 
+@pytest.mark.stt
+@pytest.mark.fast
 def test_groq():
     L, config = setup()
     for input_path, info in find_test_files("groq", "voice.mp3"):
@@ -169,6 +175,7 @@ def test_groq():
             assert False
 
 
+@pytest.mark.integration
 def test_integration_1(min_similarity, min_line_ratio):
     L, config = setup()
     root = "integration/1"
