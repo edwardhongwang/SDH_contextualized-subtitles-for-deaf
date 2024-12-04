@@ -116,7 +116,7 @@ def run_main(config):
 
 def ensure_audio_input(args):
     ext = Path(args.input).suffix
-    audio = {'mp3'}
+    audio = {'.mp3', '.wav'}
     return args.input if ext in audio else (
         extract_audio_from_video(args.input)
     )
