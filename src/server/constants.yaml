@@ -1,0 +1,4 @@
+api:
+  port: 7777
+client:
+  port: 8888

@@ -1,9 +1,12 @@
 """
 Main entry point for the subtitle generation system.
 """
+import asyncio
 import logging
 import argparse
 from pathlib import Path
+from src import run_servers
+from utils import to_server_constants
 from utils import find_test_sets, run_tests
 from utils import extract_audio_from_video
 from utils import setup_logger, load_config
@@ -18,6 +21,7 @@ def parse_arguments(L, config, test_commands):
         description="Video subtitle generator", add_help=False
     )
     subparsers = parser.add_subparsers(metavar="command", dest="command")
+    subparsers.add_parser("serve", help="run web server")
 
     # Subcommand "test"
     test_list = find_test_sets()
@@ -71,7 +75,7 @@ def parse_arguments(L, config, test_commands):
 
     # Require input iff not testing
     if args.input is None:
-        if args.command not in test_commands:
+        if args.command not in (*test_commands, "serve"):
             parser.error("Please provide an --input video file.")
 
     return args
@@ -83,9 +87,18 @@ def run_main(config):
     L = logging.getLogger(__name__)
     args = parse_arguments(L, config, test_commands)
 
-    # Testing
     if args.command in test_commands:
+        # Run tests
         return run_tests(args.test_sets)
+    elif args.command == "serve":
+        # Run web servers
+        constants = to_server_constants()
+        asyncio.run(run_servers(
+            constants.get("api", {})["port"],
+            constants.get("client", {})["port"]
+        ))
+        return
+    # Otherwise, continue with pipeline
     try:
         audio_path = ensure_audio_input(args)
     except ValueError:

@@ -1,0 +1,13 @@
+html, body {
+  height: 100%;
+  padding: 0;
+  margin: 0;
+}
+body {
+  display: grid;
+  margin-top: 2em;
+  margin-bottom: 2em;
+  font-family: Arial, Helvetica, sans-serif;
+  grid-template-columns: 1fr;
+  grid-template-rows: auto 1fr;
+}
