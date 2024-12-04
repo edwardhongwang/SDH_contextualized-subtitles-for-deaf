@@ -10,6 +10,12 @@ import logging.config
 import glob
 
 
+# Server constants
+def to_server_constants():
+    return yaml.safe_load(open(
+        "./src/server/constants.yaml"
+    ))
+
 # Logging setup
 def setup_logger(config_folder=None):
     config = None

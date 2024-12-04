@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title> SDH </title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link href="/static/layout.css" rel="stylesheet">
+      
+    <script type="importmap">
+      {
+        "imports": {
+          "api": "/static/api.js",
+          "index": "/static/index.js",
+          "page-root": "/static/page-root.js",
+          "style-page-root": "/static/page-root.css",
+          "page-nav": "/static/page-nav.js",
+          "style-page-nav": "/static/page-nav.css",
+          "line-list": "/static/line-list.js",
+          "style-line-list": "/static/line-list.css",
+          "style-global": "/static/global.css"
+        }
+      }
+    </script>
+    <script type="module">
+      import { index } from 'index';
+      index();
+    </script>
+
+  </head>
+  <body>
+    <page-root></page-root>
+    <template id="page-root-view">
+      <page-nav></page-nav>
+      <line-list lines="0 0 0"></line-list>
+      <div>© 2024</div>
+    </template>
+    <template id="page-nav-view">
+      <div><button>random</button></div>
+    </template>
+  </body>
+</html>
