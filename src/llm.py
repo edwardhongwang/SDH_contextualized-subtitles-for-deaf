@@ -68,6 +68,7 @@ Please perform a thorough proofreading and editing of the provided transcript. Y
     - Keep subtitle lines to an appropriate length (aim for a maximum of 42 characters per line).
     - Split or combine lines where necessary to improve readability.
     - Ensure that subtitles are synchronized with the spoken content.
+    - do not include extra spacing in the transcript, follow srt format strictly
 
 11. **Spelling and Typos:**
     - Correct all spelling mistakes and typos.
@@ -82,27 +83,23 @@ Please perform a thorough proofreading and editing of the provided transcript. Y
     - Ensure consistent use of units (e.g., miles, kilometers) and provide conversions if helpful.
     - Use appropriate abbreviations (e.g., "ft" for feet, "mi" for miles").
 
-14. **Language Usage:**
-    - Use appropriate language and tone suitable for the intended audience.
-    - Correct any inappropriate language or profanity, considering the context.
-
-15. **Technical Accuracy:**
+14. **Technical Accuracy:**
     - Verify facts, figures, and technical information for accuracy.
     - Use reliable sources if necessary to confirm details.
 
-16. **Homophones and Similar-Sounding Words:**
+15. **Homophones and Similar-Sounding Words:**
     - Be cautious with words that sound alike but have different meanings.
     - Use context to determine the correct word (e.g., "toes" vs. "tows").
 
-17. **Misheard Words and Corrections:**
+16. **Misheard Words and Corrections:**
     - Identify and correct misheard words, especially technical terms and proper nouns.
     - Ensure that the terminology used is appropriate for the subject matter.
 
-18. **Subtitle Timing and Synchronization:**
+17. **Subtitle Timing and Synchronization:**
     - Adjust subtitle timing to match the pacing of the spoken content.
     - Ensure that subtitles appear on screen long enough to be read comfortably.
 
-19. **Additional Considerations:**
+18. **Additional Considerations:**
     - Do not alter the original meaning or introduce new content.
     - Preserve the style and tone of the original speakers as much as possible.
     - Ensure the final transcript is professional, clear, and accurate.
@@ -163,3 +160,7 @@ def remove_any_prefix(edited_srt_content):
         lines = edited_srt_content.split('\n')
         edited_srt_content = '\n'.join(lines[1:])
     return edited_srt_content
+
+
+
+    
