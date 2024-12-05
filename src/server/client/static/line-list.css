@@ -12,4 +12,8 @@
     display: grid;
     gap: var(--gap-average);
   }
+  h1,h2,h3,h4,h5,h6 {
+    font-weight: var(--weight-display);
+    font-family: var(--font-display);
+  }
 }

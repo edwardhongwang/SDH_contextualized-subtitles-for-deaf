@@ -4,6 +4,8 @@ import { get_sum } from "api";
 
 class LineList extends HTMLElement {
 
+  static observedAttributes = ["lines"];
+
   constructor() {
     super();
     this.attachShadow({ mode: "open" });
@@ -17,7 +19,6 @@ class LineList extends HTMLElement {
   }
 
   async render() {
-    this.shadowRoot.innerHTML = "";
     const lines = this.getAttribute("lines").split(" ");
     const items = document.createElement("div"); 
     lines.forEach(line => {
@@ -25,20 +26,27 @@ class LineList extends HTMLElement {
       el.innerText = line;
       items.appendChild(el);
     })
-    this.shadowRoot.appendChild(items);
     const title = document.createElement("h3"); 
     title.innerText = "Summed via Server API...";
-    this.shadowRoot.appendChild(title);
-    const el = document.createElement("div"); 
+    const result_el = document.createElement("div"); 
     try {
-      el.innerText = "Total = " + (await get_sum(
+      result_el.innerText = "Total = " + (await get_sum(
         "http://localhost:7777/api", lines
       ));
     }
     catch {
-      el.innerText = "Connection Error!";
+      result_el.innerText = "Connection Error!";
     }
-    this.shadowRoot.appendChild(el);
+    this.shadowRoot.innerHTML = "";
+    this.shadowRoot.appendChild(items);
+    this.shadowRoot.appendChild(title);
+    this.shadowRoot.appendChild(result_el);
+  }
+
+  attributeChangedCallback(key, _, value) {
+    if (key == "lines") {
+      this.render();
+    }
   }
 
 }

@@ -1,5 +1,6 @@
 import { LineList } from "line-list";
 import { PageRoot } from "page-root";
+import { PagePane } from "page-pane";
 import { PageNav } from "page-nav";
 
 const valid_events = new Set([
@@ -7,6 +8,10 @@ const valid_events = new Set([
 ])
 
 const index = (user) => {
+  // Subtitle lines
+  customElements.define(
+    "line-list", LineList
+  )
   // Nav
   customElements.define(
     "page-nav", eventSender(PageNav)
@@ -17,10 +22,12 @@ const index = (user) => {
       PageRoot, PageRoot.eventHandlerKeys
     )
   );
-  // Subtitle lines
+  // Pane
   customElements.define(
-    "line-list", LineList
-  )
+    "page-pane", eventReceiver(
+      PagePane, PagePane.eventHandlerKeys
+    )
+  );
 };
 
 

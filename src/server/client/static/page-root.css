@@ -1,6 +1,11 @@
 :host {
-  height: 100%;
   display: grid;
-  justify-items: center;
-  grid-template-rows: auto auto 1fr;
+  justify-items: end;
+  color: hwb(var(--light));
+  padding-top: var(--gap-average);
+  padding-bottom: var(--gap-average);;
+  font-weight: var(--weight-content);
+  font-family: var(--font-content);
+  grid-template-rows: var(--pane-tall) auto;
+  grid-template-columns: var(--pane-wide);
 }
