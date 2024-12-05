@@ -12,8 +12,10 @@ import logging
 from difflib import ndiff,SequenceMatcher
 from utils import setup_logger, load_config
 from src import create_output_transcript_path
+from src import to_described_transcript_path
 from src import use_speech_to_text_engine 
 from src import use_llm_proofreader
+from src import use_sound_describer
 from src import main 
 
 @pytest.fixture
@@ -175,6 +177,43 @@ def test_groq():
             assert False
 
 
+@pytest.mark.sounds
+def test_sounds(min_similarity, min_line_ratio):
+    L, config = setup()
+    root = "sounds"
+    stt_engine = "deepgram"
+    for input_path, info in find_test_files(root, "voice.mp3"):
+        # Copy the input transcript from the info.yaml file
+        temp_transcript_path = input_path.parent / "temp.srt"
+        with open(temp_transcript_path,'w') as wf:
+            wf.write(info["inputs"].get('transcript', ''))
+        # Actual output transcript path
+        transcript_path = to_described_transcript_path(
+            temp_transcript_path
+        )
+        label = info.get('label', input_path)
+        L.debug(f'Processing {input_path.name}: "{label}"')
+        expected_text = info.get('expected', '')
+        result_text = use_sound_describer(
+            L, config, temp_transcript_path, input_path
+        )
+        expected = [
+            line.content for line in srt.parse(expected_text)
+        ]
+        result = [
+            line.content for line in srt.parse(result_text)
+        ]
+        metric = similarity_metric(expected, result, min_similarity)
+        L.debug(
+            f'{100*metric:.0f}% expected lines found with ≥'
+            f'{100*min_similarity:.0f}% similarity'
+        )
+        if metric < min_line_ratio:
+            L.error('\n'.join(ndiff(expected, result)))
+            assert False
+        else:
+            L.debug('\n'.join(ndiff(expected, result)))
+
 @pytest.mark.integration
 def test_integration_1(min_similarity, min_line_ratio):
     L, config = setup()
@@ -189,7 +228,7 @@ def test_integration_1(min_similarity, min_line_ratio):
         expected_text = info.get('expected', '')
         result_text = main(
             L, config, input_path, transcript_path,
-            stt_engine
+            stt_engine=stt_engine, describe_sounds=False
         )
         expected = [
             line.content for line in srt.parse(expected_text)

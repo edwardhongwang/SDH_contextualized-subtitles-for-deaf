@@ -1,0 +1,13 @@
+source: https://www.youtube.com/watch?v=kWVFEVWJMz8
+license: null
+speaker: https://www.wikidata.org/wiki/Q2837916
+label: Joe Rinaudo on the American Fotoplayer
+inputs:
+  transcript: |-
+    1
+    00:00:00,240 --> 00:00:01,630
+    Bang! Hit it, Joe.
+expected: |-
+  1
+  00:00:00,240 --> 00:00:01,630
+  Bang! Hit it, Joe.

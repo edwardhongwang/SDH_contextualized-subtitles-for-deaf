@@ -45,7 +45,7 @@ def parse_arguments(L, config, test_commands):
 
     # Advanced options
     stt_set = {"deepgram", "groq"}
-    sound_set = {"basic", "detailed"}
+    sound_set = {"disabled", "enabled"}
     emotion_set = {"disabled", "enabled"}
     stt_default_default = "deepgram"
     stt_default = config.get('stt', {})['primary_engine']
@@ -59,7 +59,7 @@ def parse_arguments(L, config, test_commands):
         help="Enable emotion detection"
     )
     group.add_argument(
-        "--sound-description", choices=sound_set, default="basic",
+        "--sound-description", choices=sound_set, default="disabled",
         help="Sound description level"
     )
     group.add_argument("--help", "-h", action="help")
@@ -110,20 +110,26 @@ def run_main(config):
         "enabled": True, "disabled": False
     }.get(args.emotion_detection, None)
     assert use_emotion in {True, False}
+
+    # Sound descriptions as boolean value
+    describe_sounds = {
+        "enabled": True, "disabled": False
+    }.get(args.emotion_detection, None)
+    assert describe_sounds in {True, False}
+
     assert Path(audio_path).exists()
 
     # TODO: unused arguments
     if (use_emotion):
         L.warning(f"Ignoring Emotion Detection: {use_emotion}")
-    if (args.sound_description):
-        L.warning(f"Ignoring Sound Description: {args.sound_description}")
 
     transcript_path = create_output_transcript_path(
         args.output, audio_path, args.stt_engine
     )
     main(
         L, config, audio_path, transcript_path,
-        stt_engine=args.stt_engine
+        stt_engine=args.stt_engine,
+        describe_sounds=describe_sounds
     )
 
 

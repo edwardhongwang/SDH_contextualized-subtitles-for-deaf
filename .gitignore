@@ -19,3 +19,4 @@ tests/debug.*
 tests/error.*
 # Ignore integration artefacts
 tests/integration/**/*.srt
+tests/**/temp.srt

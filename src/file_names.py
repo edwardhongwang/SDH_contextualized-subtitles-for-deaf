@@ -1,6 +1,13 @@
 import os
 
 
+def to_described_transcript_path(srt_file_path):
+    """ Create the output SRT file path """
+    srt_folder = os.path.dirname(srt_file_path)
+    srt_filename = os.path.basename(srt_file_path)
+    return os.path.join(srt_folder, f"description_{srt_filename}")
+
+
 def audio_path_to_transcript_path(audio_path, model="unknown"):
     # Get directory and base name of the audio file
     audio_dir = os.path.dirname(audio_path)
