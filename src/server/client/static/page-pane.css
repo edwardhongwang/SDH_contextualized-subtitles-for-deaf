@@ -6,6 +6,6 @@
   border: var(--light-border);
   background-color: hwb(var(--black));
   border-radius: var(--pane-border-radius);
-  box-shadow: var(--pane-shadow);
+  box-shadow: var(--main-shadow);
   grid-template-rows: auto 1fr;
 }
