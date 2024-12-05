@@ -88,13 +88,31 @@ python main.py --input video.mp4 --output subtitles.srt
 ```
 
 ```bash
-python main.py --input video.mp3 --output subtitles.srt
+python main.py --input audio.mp3 --output subtitles.srt
 ```
 
 ### Running Tests
 
+List all categories of tests
+
 ```bash
-python main.py test
+python main.py test -h
+```
+
+Run certain tests, example "llm":
+
+```
+python main.py test llm 
+```
+
+```
+python main.py test llm 
+```
+
+Run all tests
+
+```
+python main.py tests
 ```
 
 ### Advanced Options

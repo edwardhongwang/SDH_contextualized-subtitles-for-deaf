@@ -1,0 +1,35 @@
+:host {
+  --black: 190 1.6% 97%;
+  --light-main: 190 70% 3.9%;
+  --light-error: 350 53% 0%;
+  --light-focus: 36 35% 0%;
+  --dark-main: 190 0% 80%;
+  --dark-error: 20 0% 80%;
+  --dark-focus: 290 0% 80%;
+  --white: 36 100% 0%;
+  --light: 36 95% 0%;
+  --focus-shadow: 
+    0 3px 7px hwb(var(--light-focus) / 0.5),
+    inset 0 3px 3px hwb(var(--light-focus) / 0.5);
+  --main-shadow: 
+    0 3px 7px hwb(var(--light-main) / 0.5),
+    inset 0 3px 3px hwb(var(--light-main) / 0.5);
+  --error-shadow: 
+    0 3px 7px hwb(var(--light-error) / 0.5),
+    inset 0 3px 3px hwb(var(--light-error) / 0.5);
+  --pane-border-radius: 15px;
+  --button-border-radius: 7px;
+  --light-border: 1px solid hwb(var(--light) / 0.7);
+  --main-border: 1px solid hwb(var(--light-main) / 0.7);
+  --focus-border: 1px solid hwb(var(--light-focus) / 0.7);
+  --error-border: 1px solid hwb(var(--light-error) / 0.7);
+  --button-text-shadow: black -1px 1px 2px;
+  --font-display: "Red Hat Display", sans-serif;
+  --font-content: "Montserrat", sans-serif;
+  --weight-display: 500;
+  --gap-average: 1em;
+  --gap-tiny: 0.25em;
+  --button-wide: 15em;
+  --pane-tall: 15em;
+  --pane-wide: 300px;
+}

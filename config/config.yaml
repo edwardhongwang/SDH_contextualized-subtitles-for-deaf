@@ -16,7 +16,6 @@ emotion:
   detection_enabled: true
   intensity_threshold: 0.6
 
-# TODO
-sound:
-  description_detail: "detailed"
-  min_volume_threshold: -30
+sounds:
+  min_gap_duration: 1.5 
+  context_lines: 4

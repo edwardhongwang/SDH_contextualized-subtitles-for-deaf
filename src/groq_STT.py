@@ -21,7 +21,7 @@ def groq_audio_api(
     }
     # Protects the identity of the local filepath
     file = (
-        f'0.{ext}', open(audio_path, 'rb').read()
+        f'0{ext}', open(audio_path, 'rb').read()
     )
     files = {
         'file': file,

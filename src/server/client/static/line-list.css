@@ -1,0 +1,19 @@
+:host {
+  overflow-y: scroll;
+  margin: calc(var(--gap-average)/2);
+  padding: calc(var(--gap-average)/2);
+  grid-template-columns: var(--panel-wide);
+  grid-template-rows: var(--panel-tall) auto 4em;
+  grid-auto-flow: row;
+  justify-items: center;
+  align-items: center;
+  display: grid;
+  > div {
+    display: grid;
+    gap: var(--gap-average);
+  }
+  h1,h2,h3,h4,h5,h6 {
+    font-weight: var(--weight-display);
+    font-family: var(--font-display);
+  }
+}
