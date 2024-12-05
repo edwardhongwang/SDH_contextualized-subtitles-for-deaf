@@ -1,13 +1,22 @@
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&family=Red+Hat+Display:ital,wght@0,300..900;1,300..900&display=swap');
+
 html, body {
-  height: 100%;
+  --deep-black: 160 0% 100%;
   padding: 0;
   margin: 0;
 }
 body {
   display: grid;
-  margin-top: 2em;
-  margin-bottom: 2em;
-  font-family: Arial, Helvetica, sans-serif;
-  grid-template-columns: 1fr;
-  grid-template-rows: auto 1fr;
+  padding-top: 2em;
+  padding-bottom: 2em;
+  justify-items: center;
+  grid-template-columns: auto;
+  grid-template-rows: auto auto;
+  background-color: hwb(var(--deep-black));
+  align-content: space-between;
+  min-height: 80vh;
+  > .footer {
+    color: white;
+    font-family: "Montserrat", sans-serif;
+  }
 }

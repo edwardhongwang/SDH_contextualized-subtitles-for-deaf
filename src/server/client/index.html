@@ -12,6 +12,8 @@
           "index": "/static/index.js",
           "page-root": "/static/page-root.js",
           "style-page-root": "/static/page-root.css",
+          "page-pane": "/static/page-pane.js",
+          "style-page-pane": "/static/page-pane.css",
           "page-nav": "/static/page-nav.js",
           "style-page-nav": "/static/page-nav.css",
           "line-list": "/static/line-list.js",
@@ -28,10 +30,13 @@
   </head>
   <body>
     <page-root></page-root>
+    <div class="footer">© 2024</div>
     <template id="page-root-view">
+      <page-pane lines="0 0 0"></page-pane>
       <page-nav></page-nav>
-      <line-list lines="0 0 0"></line-list>
-      <div>© 2024</div>
+    </template>
+    <template id="page-pane-view">
+      <line-list></line-list>
     </template>
     <template id="page-nav-view">
       <div><button>random</button></div>

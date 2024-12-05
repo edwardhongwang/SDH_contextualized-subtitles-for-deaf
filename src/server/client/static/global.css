@@ -1,6 +1,38 @@
 :host {
+  --black: 160 1.6% 97%;
+  --light-main: 160 70% 3.9%;
+  --light-error: 350 53% 0%;
+  --light-focus: 36 35% 0%;
+  --dark-main: 160 0% 80%;
+  --dark-error: 20 0% 80%;
+  --dark-focus: 290 0% 80%;
+  --white: 36 100% 0%;
+  --light: 36 95% 0%;
+  --pane-shadow: 
+    0 8px 15px hwb(var(--light-focus) / 0.5),
+    inset 0 6px 6px hwb(var(--light-focus) / 0.5);
+  --button-focus-shadow: 
+    0 3px 7px hwb(var(--light-focus) / 0.5),
+    inset 0 3px 3px hwb(var(--light-focus) / 0.5);
+  --button-main-shadow: 
+    0 3px 7px hwb(var(--light-main) / 0.5),
+    inset 0 3px 3px hwb(var(--light-main) / 0.5);
+  --button-error-shadow: 
+    0 3px 7px hwb(var(--light-error) / 0.5),
+    inset 0 3px 3px hwb(var(--light-error) / 0.5);
+  --pane-border-radius: 15px;
+  --button-border-radius: 7px;
+  --light-border: 1px solid hwb(var(--light));
+  --main-border: 1px solid hwb(var(--light-main));
+  --focus-border: 1px solid hwb(var(--light-focus));
+  --error-border: 1px solid hwb(var(--light-error));
+  --button-text-shadow: black 1px 0 10px;
+  --font-display: "Red Hat Display", sans-serif;
+  --font-content: "Montserrat", sans-serif;
+  --weight-display: 500;
   --gap-average: 1em;
-  --panel-tall: 12em;
-  --panel-wide: 12em;
+  --gap-tiny: 0.25em;
   --button-wide: 15em;
+  --pane-tall: 15em;
+  --pane-wide: 300px;
 }

@@ -28,13 +28,14 @@ class PageRoot extends HTMLElement {
   toEventHandler(key) {
     if (key === "srt-lines/redraw") {
       return async ({ detail }) => {
-        const line_list_el = this.shadowRoot.querySelector(
-          "line-list"
+        const panes = this.shadowRoot.querySelectorAll(
+          "page-pane"
         );
-        line_list_el.setAttribute(
-          "lines", detail.lines.join(" ")
-        )
-        await line_list_el.render();
+        await Promise.all(
+          [...panes].map(pane => {
+            pane.setAttribute("lines", detail.lines.join(" "));
+          })
+        );
       }
     }
   }
