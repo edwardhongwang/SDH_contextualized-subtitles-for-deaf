@@ -1,12 +1,40 @@
-const run_all = async (root, listing) => {
+const make_plain = async (root, listing) => {
   return (
-    await (await fetch(`${root}/sdh/all/${listing}`)).json()
+    await (await fetch(`${root}/make/${listing}`)).json()
   )
+}
+
+const enrich_all = async (
+  root, listing, transcript, old_transcript_state=[]
+) => {
+  const transcript_state = [
+    "edits", "sounds", "emotions"
+  ];
+  const must_add = transcript_state.filter(
+    key => !old_transcript_state.includes(key)
+  );
+  const parts = [
+    listing, old_transcript_state.join('/'),
+    must_add.join('+')
+  ].filter(
+    (part, index) => index !== 1 || part !== ''
+  ).join('/');
+  const lines = (
+    await (await fetch(`${root}/enrich/${parts}`, {
+      method: "POST", body: JSON.stringify(transcript),
+      headers: {
+        "Content-Type": "application/json",
+      }
+    })).json()
+  )
+  return {
+    lines, transcript_state
+  }
 }
 
 const get_info = async (root, listing, width) => {
   const info = (
-    await (await fetch(`${root}/sdh/info/${listing}`)).json()
+    await (await fetch(`${root}/info/${listing}`)).json()
   )
   const parse = await get_entity(info.speaker.split('/').pop());
   const { displaytitle } = parse;
@@ -38,5 +66,6 @@ const get_image = async (parse, width) => {
 const root = "http://localhost:7777/api";
 
 export {
-  get_info, run_all, root, get_image
+  get_info, root, get_image,
+  make_plain, enrich_all
 }

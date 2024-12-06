@@ -206,4 +206,32 @@ def parse_srt(content):
     return subtitles
 
 
+def format_srt_time(timedelta_obj):
+    """Formats timedelta to SRT timestamp."""
+    total_seconds = int(timedelta_obj.total_seconds())
+    milliseconds = int(timedelta_obj.microseconds / 1000) + int(timedelta_obj.microseconds % 1000 > 500)
+    hours = total_seconds // 3600
+    minutes = (total_seconds % 3600) // 60
+    seconds = total_seconds % 60
+    return f"{hours:02}:{minutes:02}:{seconds:02},{milliseconds:03}"
 
+
+def format_srt_lines(subtitles):
+    """Format the subtitles"""
+    # Sort subtitles by start time
+    subtitles.sort(key=lambda x: x['start_time'])
+    
+    # Reassign indices
+    for i, subtitle in enumerate(subtitles):
+        subtitle['index'] = i + 1
+
+    for subtitle in subtitles:
+        index = subtitle['index']
+        start_time = format_srt_time(subtitle['start_time'])
+        end_time = format_srt_time(subtitle['end_time'])
+        text = subtitle['text']
+        yield f"{index}\n{start_time} --> {end_time}\n{text}\n"
+
+
+def format_srt(subtitles):
+    return "\n".join(format_srt_lines(subtitles))

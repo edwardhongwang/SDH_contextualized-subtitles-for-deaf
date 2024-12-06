@@ -51,6 +51,7 @@
           "api": "/static/api.js",
           "index": "/static/index.js",
           "page-root": "/static/page-root.js",
+          "sound-counts": "/static/sound-counts.js",
           "style-page-root": "/static/page-root.css",
           "page-data": "/static/page-data.js",
           "style-page-data": "/static/page-data.css",
@@ -74,11 +75,12 @@
     <page-root></page-root>
     <div class="footer">© 2024</div>
     <template id="page-root-view">
-      <page-data listing="maipi-clarke" lines="[]"></page-data>
+      <page-data listing="maipi-clarke" lines="[]" transcript_state="">
+      </page-data>
     </template>
     <template id="page-data-view">
       <page-pane></page-pane>
-      <page-nav></page-nav>
+      <page-nav actions="main new"></page-nav>
     </template>
     <template id="page-pane-view">
       <div>
@@ -92,13 +94,9 @@
       <button id="main">
         <span>Full SDH</span>
       </button>
-      <button id="transcribe">
-        <span>Transcribe</span>
-        <span>Speech</span>
-      </button>
-      <button id="proofread">
+      <button id="edits">
         <span>Proofread</span>
-        <span>Script</span>
+        <span>Speech</span>
       </button>
       <button id="sounds">
         <span>Describe</span>
@@ -112,7 +110,7 @@
         <span>Undo</span>
       </button>
       <button id="new">
-        <span>New Audio</span>
+        <span>New</span>
       </button>
     </template>
   </body>

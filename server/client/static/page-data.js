@@ -1,13 +1,14 @@
 import StyleGlobal from "style-global" with { type: "css" };
 import StylePageData from "style-page-data" with { type: "css" };
-import { root, run_all, get_info, get_image } from "api";
+import { root, get_info, get_image } from "api";
+import { make_plain, enrich_all } from "api";
 
 class PageData extends HTMLElement {
 
   static observedAttributes = ["lines"];
 
   static eventHandlerKeys = [
-    "srt-lines/redraw"
+    "srt-page/enrich"
   ];
 
   constructor() {
@@ -28,7 +29,7 @@ class PageData extends HTMLElement {
     const info = await get_info(
       root, listing, 100
     );
-    run_all(root, listing).then((lines) => {
+    make_plain(root, listing).then((lines) => {
       this.setAttribute("lines", JSON.stringify(lines))
     });
     this.setAttribute("image", info.image);
@@ -43,8 +44,12 @@ class PageData extends HTMLElement {
 
   renderPaneLineList(target) {
     const lines = this.getAttribute("lines");
+    const transcript_state = this.getAttribute(
+      "transcript_state"
+    );
     const pane_el = target.querySelector("page-pane");
     if (pane_el) {
+      pane_el.setAttribute("transcript_state", transcript_state);
       pane_el.setAttribute("lines", lines);
     }
   }
@@ -56,12 +61,25 @@ class PageData extends HTMLElement {
   }
 
   toEventHandler(key) {
-    if (key === "srt-lines/redraw") {
+    if (key === "srt-page/enrich") {
       return ({ detail }) => {
-        console.log("redraw");
         const listing = this.getAttribute("listing");
-        run_all(root, listing).then((lines) => {
-          this.setAttribute("lines", JSON.stringify(lines))
+        const transcript = JSON.parse(
+          this.getAttribute("lines")
+        );
+        this.setAttribute("lines", JSON.stringify([]));
+        const transcript_state = this.getAttribute(
+          "transcript_state"
+        ).split(" ");
+        enrich_all(
+          root, listing, transcript, transcript_state
+        ).then(({lines, transcript_state}) => {
+          this.setAttribute("transcript_state", 
+            transcript_state.join(" ")
+          );
+          this.setAttribute("lines", JSON.stringify(lines));
+          const nav_el = this.shadowRoot.querySelector("page-nav");
+          nav_el.setAttribute("actions", "new");
         });
       }
     }

@@ -3,6 +3,8 @@ import StylePageNav from "style-page-nav" with { type: "css" };
 
 class PageNav extends HTMLElement {
 
+  static observedAttributes = ["actions"];
+
   constructor() {
     super();
     this.attachShadow({ mode: "open" });
@@ -23,7 +25,7 @@ class PageNav extends HTMLElement {
       [
         this.shadowRoot.getElementById("main"), () => {
           const host = this.getRootNode().host;
-          this.sendCustomEvent("srt-lines/redraw", {
+          this.sendCustomEvent("srt-page/enrich", {
             id: host.getAttribute("id")
           })
         }
@@ -39,17 +41,21 @@ class PageNav extends HTMLElement {
     ].map(
       ([el, action]) => el.addEventListener("click", action)
     )
-    this.showButtonSet(new Set([
-      "main", "new"
-//      "main", "transcribe", "proofread", "sounds", "new"
-    ]))
+    this.showButtonSet(this.getAttribute("actions"));
   }
 
-  showButtonSet(button_set) {
+  showButtonSet(actions) {
+    const button_set = new Set(actions.split(" "));
     const buttons = this.shadowRoot.querySelectorAll("button");
     [...buttons].forEach((button) => {
       button.className= button_set.has(button.id) ? "" : "hide"
     })
+  }
+
+  attributeChangedCallback(key, _, value) {
+    if (key == "actions") {
+      this.showButtonSet(value);
+    }
   }
 
 }

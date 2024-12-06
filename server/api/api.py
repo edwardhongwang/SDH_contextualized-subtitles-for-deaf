@@ -1,5 +1,5 @@
-import logging
 from pathlib import Path
+from typing import Annotated 
 from starlette.status import HTTP_422_UNPROCESSABLE_ENTITY as _422
 from fastapi.exceptions import RequestValidationError
 from fastapi.middleware.cors import CORSMiddleware
@@ -7,14 +7,12 @@ from concurrent.futures import ThreadPoolExecutor
 from fastapi.responses import JSONResponse
 from starlette.requests import Request
 import yaml
-from fastapi import Depends, FastAPI 
+from fastapi import Depends, FastAPI
 from contextlib import asynccontextmanager
+from .transcripts import (
+    TranscriptError, makers, enrichers 
+)
 from utils import to_server_constants
-from utils import load_config
-from src import use_speech_to_text_engine 
-from src import use_llm_proofreader
-from src import use_sound_describer
-from utils import parse_srt
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
@@ -34,6 +32,7 @@ sdh_api.add_middleware(
 
 pool = ThreadPoolExecutor(max_workers=1)
 
+
 # Handle common FastAPI exceptions
 @sdh_api.exception_handler(RequestValidationError)
 async def validation_exception_handler(request: Request, exc: RequestValidationError):
@@ -47,40 +46,61 @@ def open_root_api(constants=Depends(to_server_constants)):
     return constants 
 
 
-@sdh_api.get("/api/sum/{numbers}")
-def open_root_api(numbers):
-    return sum(
-        int(s) for s in numbers.split("+")
-    )
+@sdh_api.get("/api/make/{listing}")
+def none_to_all_sdh_transcript(
+    transcript: Annotated[str, Depends(
+        makers[()]
+    )]
+):
+    ''' Plain '''
+    try:
+        return transcript
+    except TranscriptError:
+        raise HTTPException(status_code=404, detail="No listing")
 
 
-@sdh_api.get("/api/sdh/all/{listing}")
-def full_sdh_transcript(listing):
-    # TODO make more robust against malicious users
-    folder = Path(listing).resolve().parts[-1]
-    static = Path("server/client/static")
-    input_folder = static / folder
-    audio_path = input_folder / "voice.mp3"
-    if not input_folder.is_dir() or not audio_path.is_file():
-        return [] #TODO 
-    L = logging.getLogger(__name__)
-    config = load_config(L, Path('config'))
-    # Speech transcriber
-    transcript = use_speech_to_text_engine(
-        L, config, audio_path, stt_engine="deepgram"
-    )
-    proofread_transcript = use_llm_proofreader(
-        L, config, transcript
-    )
-    described_transcript = use_sound_describer(
-        L, config, proofread_transcript, audio_path
-    )
-    return parse_srt(
-        described_transcript
-    )
+@sdh_api.get("/api/make/{listing}/edits")
+def none_to_all_sdh_transcript(
+    transcript: Annotated[str, Depends(
+        makers[("edits",)]
+    )]
+):
+    ''' Edits only '''
+    try:
+        return transcript
+    except TranscriptError:
+        raise HTTPException(status_code=404, detail="No listing")
 
 
-@sdh_api.get("/api/sdh/info/{listing}")
+@sdh_api.get("/api/make/{listing}/edits/sounds/emotions")
+def none_to_all_sdh_transcript(
+    transcript: Annotated[str, Depends(
+        makers[("edits", "sounds", "emotions")]
+    )]
+):
+    ''' All SDH '''
+    try:
+        return transcript
+    except TranscriptError:
+        raise HTTPException(status_code=404, detail="No listing")
+
+
+@sdh_api.post(
+    "/api/enrich/{listing}/edits+sounds+emotions"
+)
+def none_to_all_sdh_transcript(
+    transcript: Annotated[str, Depends(
+        enrichers[("edits", "sounds", "emotions")][()]
+    )]
+):
+    ''' From Plain to All SDH '''
+    try:
+        return transcript
+    except TranscriptError:
+        raise HTTPException(status_code=404, detail="No listing")
+
+
+@sdh_api.get("/api/info/{listing}")
 def sdh_info(listing):
     # TODO make more robust against malicious users
     folder = Path(listing).resolve().parts[-1]
