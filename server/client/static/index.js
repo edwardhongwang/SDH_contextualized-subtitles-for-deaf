@@ -1,32 +1,46 @@
 import { LineList } from "line-list";
 import { PageRoot } from "page-root";
+import { PageData } from "page-data";
 import { PagePane } from "page-pane";
 import { PageNav } from "page-nav";
 
 const valid_events = new Set([
-  "srt-lines/redraw"
+  "srt-lines/redraw",
+  "srt-pages/new"
 ])
 
 const index = (user) => {
-  // Subtitle lines
-  customElements.define(
-    "line-list", LineList
-  )
-  // Nav
-  customElements.define(
-    "page-nav", eventSender(PageNav)
-  );
-  // Page 
+  // Pages
   customElements.define(
     "page-root", eventReceiver(
       PageRoot, PageRoot.eventHandlerKeys
     )
   );
+  // Page
+  customElements.define(
+    "page-data", eventReceiver(
+      PageData,
+      PageData.eventHandlerKeys
+    )
+  );
   // Pane
   customElements.define(
-    "page-pane", eventReceiver(
-      PagePane, PagePane.eventHandlerKeys
+    "page-pane", (
+      inherit(PagePane, [
+        "lines", "id", "label", "source",
+        "image", "header"
+      ])
     )
+  );
+  // Subtitle lines
+  customElements.define(
+    "line-list", inherit(LineList, [
+      "lines"
+    ])
+  )
+  // Nav
+  customElements.define(
+    "page-nav", eventSender(PageNav)
   );
 };
 
@@ -62,15 +76,18 @@ const eventReceiver = (element, keys=[]) => {
 }
 
 
-const inherit = (element, attrs=["self"]) => {
+const inherit = (element, attrs) => {
   return class extends element {
-    render() {
+    async connectedCallback() {
       const host = this.getRootNode().host;
       attrs.forEach(attr => {
-        if (!host.hasAttribute(attr)) return;
-        this.setAttribute(attr, host.getAttribute(attr));
+        if (host.hasAttribute(attr)) {
+          this.setAttribute(
+            attr, host.getAttribute(attr)
+          );
+        };
       });
-      super.render();
+      await super.connectedCallback();
     }
   }
 }

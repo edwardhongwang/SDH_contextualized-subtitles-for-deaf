@@ -10,7 +10,7 @@ def to_server(port, scope, module, log_level):
         "reload": True,
         "host": "0.0.0.0",
         "log_level": log_level,
-        "app": f"src:{scope}_{module}"
+        "app": f"server:{scope}_{module}"
     }
     # Run with or without TLS
     config = uvicorn.Config(**uvicorn_config)

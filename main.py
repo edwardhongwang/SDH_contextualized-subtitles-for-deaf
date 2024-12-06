@@ -5,7 +5,7 @@ import asyncio
 import logging
 import argparse
 from pathlib import Path
-from src import run_servers
+from server import run_servers
 from utils import to_server_constants
 from utils import find_test_sets, run_tests
 from utils import extract_audio_from_video

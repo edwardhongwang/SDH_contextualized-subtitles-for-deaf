@@ -6,29 +6,8 @@ import subprocess
 from datetime import timedelta
 import json
 from openai import OpenAI
+from utils import parse_srt
 from .errors import AudioExtractionError
-
-
-def parse_srt(srt_file_path):
-    """Parses the SRT file and returns a list of subtitle entries."""
-    with open(srt_file_path, 'r', encoding='utf-8') as file:
-        content = file.read()
-
-    subtitles = []
-
-    for match in srt.parse(content):
-        index = match.index 
-        start_time = match.start 
-        end_time = match.end 
-        text = match.content 
-        subtitles.append({
-            'index': index,
-            'start_time': start_time,
-            'end_time': end_time,
-            'text': text
-        })
-
-    return subtitles
 
 
 def parse_srt_time(time_str):
@@ -278,7 +257,7 @@ def format_srt_lines(subtitles):
 
 
 def non_speech_labeling(
-    L, srt_file_path, audio_file_path,
+    L, transcript, audio_file_path,
     min_gap_duration=1.5, context_lines=4
 ):
     # Set your OpenAI API key
@@ -289,8 +268,8 @@ def non_speech_labeling(
     try:
         L.info("Starting processing.")
         # Parse the existing SRT file
-        subtitles = parse_srt(srt_file_path)
-        L.info(f"Parsed {len(subtitles)} subtitles from {srt_file_path}.")
+        subtitles = parse_srt(transcript)
+        L.info(f"Parsed {len(subtitles)} subtitles from transcript.")
 
         # Find gaps longer than min_gap_duration seconds
         gaps = find_gaps(subtitles, min_gap_duration)

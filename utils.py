@@ -8,12 +8,13 @@ import pytest
 import logging
 import logging.config
 import glob
+import srt
 
 
 # Server constants
 def to_server_constants():
     return yaml.safe_load(open(
-        "./src/server/constants.yaml"
+        "./server/constants.yaml"
     ))
 
 # Logging setup
@@ -184,3 +185,25 @@ def load_config(L, config_folder):
         L.info(
             "Hint\ncp .env.example .env"
         )
+
+
+def parse_srt(content):
+    """Parses the SRT file and returns a list of subtitle entries."""
+    subtitles = []
+
+    for match in srt.parse(content):
+        index = match.index 
+        start_time = match.start 
+        end_time = match.end 
+        text = match.content 
+        subtitles.append({
+            'index': index,
+            'start_time': start_time,
+            'end_time': end_time,
+            'text': text
+        })
+
+    return subtitles
+
+
+

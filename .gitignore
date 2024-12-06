@@ -20,3 +20,6 @@ tests/error.*
 # Ignore integration artefacts
 tests/integration/**/*.srt
 tests/**/temp.srt
+tests/**/*.txt
+# Ignore chat artefact
+server/client/static/**/*.txt

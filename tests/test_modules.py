@@ -110,10 +110,9 @@ def test_openai(min_similarity, min_line_ratio):
     L, config = setup()
     for input_path, info in find_test_files("openai", "input.srt"):
         label = info.get('label', input_path)
-        L.debug(f'Processing {input_path.name}: "{label}"')
         expected_text = info.get('expected', '')
         result_text = use_llm_proofreader(
-            L, config, str(input_path)
+            L, config, open(input_path).read()
         )
         expected = [
             line.content for line in srt.parse(expected_text)
@@ -122,6 +121,7 @@ def test_openai(min_similarity, min_line_ratio):
             line.content for line in srt.parse(result_text)
         ]
         metric = similarity_metric(expected, result, min_similarity)
+        L.info(f'Processed {input_path.name}: "{label}"')
         L.debug(
             f'{100*metric:.0f}% expected lines found with ≥'
             f'{100*min_similarity:.0f}% similarity'
@@ -135,11 +135,11 @@ def test_openai(min_similarity, min_line_ratio):
 
 @pytest.mark.stt
 @pytest.mark.fast
+@pytest.mark.deepgram
 def test_deepgram():
     L, config = setup()
     for input_path, info in find_test_files("deepgram", "voice.mp3"):
         label = info.get('label', input_path)
-        L.debug(f'Processing {input_path.name}: "{label}"')
         expected_text = info.get('expected', '')
         result_text = use_speech_to_text_engine(
             L, config, input_path, "deepgram"
@@ -147,12 +147,12 @@ def test_deepgram():
         expected = [
             line.content for line in srt.parse(expected_text)
         ]
-        # Expect some variation with the final line
+        # Expect some variation with a certain line
         result = [
             line.content.replace(' a Theory', ' A Theory')
             for line in srt.parse(result_text)
         ]
-        result = result
+        L.info(f'Processed {input_path.name}: "{label}"')
         if '\n'.join(expected) != '\n'.join(result):
             L.error('\n'.join(ndiff(expected, result)))
             assert False
@@ -160,17 +160,18 @@ def test_deepgram():
 
 @pytest.mark.stt
 @pytest.mark.fast
+@pytest.mark.groq
 def test_groq():
     L, config = setup()
     for input_path, info in find_test_files("groq", "voice.mp3"):
         label = info.get('label', input_path)
-        L.debug(f'Processing {input_path.name}: "{label}"')
         expected = info.get('expected', '')
         result = use_speech_to_text_engine(
             L, config, input_path, "groq"
         )
+        L.info(f'Processed {input_path.name}: "{label}"')
         if result != expected:
-            print('\n'.join(ndiff(
+            L.error('\n'.join(ndiff(
                 re.split('[.,:;\n] ?', expected),
                 re.split('[.,:;\n] ?', result)
             )))
@@ -183,19 +184,13 @@ def test_sounds(min_similarity, min_line_ratio):
     root = "sounds"
     stt_engine = "deepgram"
     for input_path, info in find_test_files(root, "voice.mp3"):
-        # Copy the input transcript from the info.yaml file
-        temp_transcript_path = input_path.parent / "temp.srt"
-        with open(temp_transcript_path,'w') as wf:
-            wf.write(info["inputs"].get('transcript', ''))
-        # Actual output transcript path
-        transcript_path = to_described_transcript_path(
-            temp_transcript_path
+        input_transcript = (
+            info["inputs"].get('transcript', '')
         )
         label = info.get('label', input_path)
-        L.debug(f'Processing {input_path.name}: "{label}"')
         expected_text = info.get('expected', '')
         result_text = use_sound_describer(
-            L, config, temp_transcript_path, input_path
+            L, config, input_transcript, input_path
         )
         expected = [
             line.content for line in srt.parse(expected_text)
@@ -204,6 +199,7 @@ def test_sounds(min_similarity, min_line_ratio):
             line.content for line in srt.parse(result_text)
         ]
         metric = similarity_metric(expected, result, min_similarity)
+        L.info(f'Processed {input_path.name}: "{label}"')
         L.debug(
             f'{100*metric:.0f}% expected lines found with ≥'
             f'{100*min_similarity:.0f}% similarity'
@@ -214,7 +210,9 @@ def test_sounds(min_similarity, min_line_ratio):
         else:
             L.debug('\n'.join(ndiff(expected, result)))
 
+
 @pytest.mark.integration
+@pytest.mark.integration_1
 def test_integration_1(min_similarity, min_line_ratio):
     L, config = setup()
     root = "integration/1"
@@ -224,7 +222,6 @@ def test_integration_1(min_similarity, min_line_ratio):
             None, input_path, stt_engine
         )
         label = info.get('label', input_path)
-        L.debug(f'Processing {input_path.name}: "{label}"')
         expected_text = info.get('expected', '')
         result_text = main(
             L, config, input_path, transcript_path,
@@ -237,6 +234,42 @@ def test_integration_1(min_similarity, min_line_ratio):
             line.content for line in srt.parse(result_text)
         ]
         metric = similarity_metric(expected, result, min_similarity)
+        L.info(f'Processed {input_path.name}: "{label}"')
+        L.debug(
+            f'{100*metric:.0f}% expected lines found with ≥'
+            f'{100*min_similarity:.0f}% similarity'
+        )
+        if metric < min_line_ratio:
+            L.error('\n'.join(ndiff(expected, result)))
+            assert False
+        else:
+            L.debug('\n'.join(ndiff(expected, result)))
+
+
+@pytest.mark.integration
+@pytest.mark.integration_2
+def test_integration_2(min_similarity, min_line_ratio):
+    L, config = setup()
+    root = "integration/2"
+    stt_engine = "deepgram"
+    for input_path, info in find_test_files(root, "voice.mp3"):
+        transcript_path = create_output_transcript_path(
+            None, input_path, stt_engine
+        )
+        label = info.get('label', input_path)
+        expected_text = info.get('expected', '')
+        result_text = main(
+            L, config, input_path, transcript_path,
+            stt_engine=stt_engine, describe_sounds=True
+        )
+        expected = [
+            line.content for line in srt.parse(expected_text)
+        ]
+        result = [
+            line.content for line in srt.parse(result_text)
+        ]
+        metric = similarity_metric(expected, result, min_similarity)
+        L.info(f'Processed {input_path.name}: "{label}"')
         L.debug(
             f'{100*metric:.0f}% expected lines found with ≥'
             f'{100*min_similarity:.0f}% similarity'

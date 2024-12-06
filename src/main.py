@@ -6,11 +6,11 @@ from .errors import APIError
 
 
 def use_sound_describer(
-    L, config, transcript_path, audio_path
+    L, config, transcript, audio_path
 ):
     sound_config = config.get('sounds', {})
     return non_speech_labeling(
-        L, transcript_path, audio_path, **{
+        L, transcript, audio_path, **{
             k:sound_config[k] for k in {
                 "min_gap_duration", "context_lines"
             }
@@ -19,7 +19,7 @@ def use_sound_describer(
 
 
 def use_speech_to_text_engine(
-    L, config, audio_path, stt_engine, describe_sounds
+    L, config, audio_path, stt_engine
 ):
     transcriber = SpeechTranscriber(config)
     if stt_engine == "deepgram":
@@ -38,13 +38,11 @@ def use_speech_to_text_engine(
 
 
 def use_llm_proofreader(
-    L, config, transcript_path
+    L, config, transcript
 ):
     transcriber = SpeechTranscriber(config)
     try:
-        return transcriber.proofread_with_llm(
-            open(transcript_path).read()
-        )
+        return transcriber.proofread_with_llm(transcript)
     except APIError as e:
         L.error(e)
 
@@ -54,33 +52,40 @@ def main(
     stt_engine, describe_sounds
 ):
     # Run speech transcriber ( Groq or Deepgram )
-    transcribed = use_speech_to_text_engine(
-        L, config, audio_path, stt_engine, describe_sounds
+    transcript = use_speech_to_text_engine(
+        L, config, audio_path, stt_engine
     )
-    with open(transcript_path, 'w') as wf:
-        wf.write(transcribed)
+    # Write if output path provided
+    if transcript_path is not None:
+        with open(transcript_path, 'w') as wf:
+            wf.write(transcript)
 
     # Run speech proofreader
     proofread_transcript = use_llm_proofreader(
-        L, config, transcript_path
+        L, config, transcript
     )
-    proofread_transcript_path = to_proofread_transcript_path(
-        transcript_path
-    )
-    with open(proofread_transcript_path, "w") as wf:
-        wf.write(proofread_transcript)
-
+    # Write if output path provided
+    if transcript_path is not None:
+        proofread_transcript_path = to_proofread_transcript_path(
+            transcript_path
+        )
+        with open(proofread_transcript_path, "w") as wf:
+            wf.write(proofread_transcript)
+    
+    # Skip sound descriptions
     if not describe_sounds:
         return proofread_transcript
 
     # Run sound describer
     described_transcript = use_sound_describer(
-        L, config, proofread_transcript_path, audio_path
+        L, config, proofread_transcript, audio_path
     )
-    described_transcript_path = to_described_transcript_path(
-        proofread_transcript_path
-    )
-    with open(described_transcript_path, "w") as wf:
-        wf.write(described_transcript)
+    # Write if output path provided
+    if transcript_path is not None:
+        described_transcript_path = to_described_transcript_path(
+            proofread_transcript_path
+        )
+        with open(described_transcript_path, "w") as wf:
+            wf.write(described_transcript)
 
     return described_transcript

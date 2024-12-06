@@ -1,6 +1,5 @@
 import StyleGlobal from "style-global" with { type: "css" };
 import StyleLineList from "style-line-list" with { type: "css" };
-import { get_sum } from "api";
 
 class LineList extends HTMLElement {
 
@@ -19,28 +18,21 @@ class LineList extends HTMLElement {
   }
 
   async render() {
-    const lines = this.getAttribute("lines").split(" ");
+    const lines = this.getAttribute("lines");
     const items = document.createElement("div"); 
-    lines.forEach(line => {
+    JSON.parse(lines).forEach(line => {
+      console.log(line);
       const el = document.createElement("div"); 
-      el.innerText = line;
+      el.innerText = line.text;
       items.appendChild(el);
     })
     const title = document.createElement("h3"); 
-    title.innerText = "Summed via Server API...";
-    const result_el = document.createElement("div"); 
-    try {
-      result_el.innerText = "Total = " + (await get_sum(
-        "http://localhost:7777/api", lines
-      ));
-    }
-    catch {
-      result_el.innerText = "Connection Error!";
+    if (!lines || !JSON.parse(lines).length) {
+      title.innerText = "Generating Transcript...";
     }
     this.shadowRoot.innerHTML = "";
     this.shadowRoot.appendChild(items);
     this.shadowRoot.appendChild(title);
-    this.shadowRoot.appendChild(result_el);
   }
 
   attributeChangedCallback(key, _, value) {

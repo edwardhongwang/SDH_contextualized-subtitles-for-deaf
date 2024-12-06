@@ -1,7 +1,6 @@
 :host {
-  overflow-y: scroll;
-  margin: calc(var(--gap-average)/2);
-  padding: calc(var(--gap-average)/2);
+  margin: var(--gap-small) 0;
+  padding: var(--gap-small);
   grid-template-columns: var(--panel-wide);
   grid-template-rows: var(--panel-tall) auto 4em;
   grid-auto-flow: row;
@@ -13,7 +12,7 @@
     gap: var(--gap-average);
   }
   h1,h2,h3,h4,h5,h6 {
-    font-weight: var(--weight-display);
+    font-weight: var(--title-weight);
     font-family: var(--font-display);
   }
 }
