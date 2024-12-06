@@ -3,7 +3,12 @@ import StylePagePane from "style-page-pane" with { type: "css" };
 
 class PagePane extends HTMLElement {
 
-  static observedAttributes = ["lines"];
+  static observedAttributes = [
+    "lines"
+];
+  static eventHandlerKeys = [
+    "srt-lines/redraw"
+  ];
 
   constructor() {
     super();
@@ -21,7 +26,12 @@ class PagePane extends HTMLElement {
     this.shadowRoot.innerHTML = "";
     const template = document.getElementById("page-pane-view");
     const copy = template.content.cloneNode(true);
-    this.renderLineList(copy);
+    const img_el = copy.querySelector("img");
+    const h3_el = copy.querySelector("h3");
+    const h4_el = copy.querySelector("h4");
+    h3_el.innerText = this.getAttribute("label");
+    h4_el.innerText = this.getAttribute("header");
+    img_el.src = this.getAttribute("image");
     this.shadowRoot.appendChild(copy);
   }
 
@@ -38,7 +48,6 @@ class PagePane extends HTMLElement {
       this.renderLineList(this.shadowRoot);
     }
   }
-
 }
 
 export { PagePane };

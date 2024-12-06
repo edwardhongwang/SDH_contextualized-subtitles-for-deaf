@@ -4,7 +4,7 @@ import StylePageRoot from "style-page-root" with { type: "css" };
 class PageRoot extends HTMLElement {
 
   static eventHandlerKeys = [
-    "srt-lines/redraw"
+    "srt-pages/new"
   ];
 
   constructor() {
@@ -26,16 +26,16 @@ class PageRoot extends HTMLElement {
   }
 
   toEventHandler(key) {
-    if (key === "srt-lines/redraw") {
-      return async ({ detail }) => {
-        const panes = this.shadowRoot.querySelectorAll(
-          "page-pane"
+    if (key === "srt-pages/new") {
+      return ({ detail }) => {
+        const { id } = detail;
+        const old_page_data = this.shadowRoot.getElementById(id);
+        const new_page_data = document.createElement("page-data");
+        new_page_data.setAttribute("lines", "[]");
+        new_page_data.setAttribute(
+          "listing", old_page_data.getAttribute("listing")
         );
-        await Promise.all(
-          [...panes].map(pane => {
-            pane.setAttribute("lines", detail.lines.join(" "));
-          })
-        );
+        this.shadowRoot.insertBefore(new_page_data, old_page_data);
       }
     }
   }

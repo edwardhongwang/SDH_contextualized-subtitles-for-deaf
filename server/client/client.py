@@ -3,7 +3,7 @@ from starlette.responses import FileResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi import FastAPI
 
-ROOT = Path("src/server/client")
+ROOT = Path("server/client")
 
 sdh_client = FastAPI()
 

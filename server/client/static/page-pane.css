@@ -1,0 +1,27 @@
+:host {
+  width: 100%;
+  display: grid;
+  align-self: end;
+  align-items: center;
+  grid-column: 1 / -2;
+  min-width: var(--pane-min);
+  grid-template-columns: 1fr;
+  padding-top: var(--gap-big);
+  min-height: calc(2*var(--pane-tall)/3);
+  height: var(--pane-tall);
+  > div {
+    height: 100%;
+    display: grid;
+    overflow: scroll;
+    align-items: center;
+    justify-items: center;
+    border: var(--light-border);
+    background-color: hwb(var(--black));
+    border-radius: var(--pane-border-radius);
+    box-shadow: var(--main-shadow);
+    h1,h2,h3,h4,h5,h6 {
+      font-weight: var(--title-weight);
+      font-family: var(--font-display);
+    }
+  }
+}
