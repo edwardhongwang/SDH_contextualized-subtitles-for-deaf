@@ -6,7 +6,7 @@ import subprocess
 from datetime import timedelta
 import json
 from openai import OpenAI
-from utils import parse_srt
+from utils import parse_srt, format_srt 
 from .errors import AudioExtractionError
 
 
@@ -239,23 +239,6 @@ def insert_events_into_srt(subtitles, events, before_index):
         index += 1
 
 
-def format_srt_lines(subtitles):
-    """Format the subtitles"""
-    # Sort subtitles by start time
-    subtitles.sort(key=lambda x: x['start_time'])
-    
-    # Reassign indices
-    for i, subtitle in enumerate(subtitles):
-        subtitle['index'] = i + 1
-
-    for subtitle in subtitles:
-        index = subtitle['index']
-        start_time = format_srt_time(subtitle['start_time'])
-        end_time = format_srt_time(subtitle['end_time'])
-        text = subtitle['text']
-        yield f"{index}\n{start_time} --> {end_time}\n{text}\n"
-
-
 def non_speech_labeling(
     L, transcript, audio_file_path,
     min_gap_duration=1.5, context_lines=4
@@ -362,7 +345,7 @@ def non_speech_labeling(
                     L.debug("Temporary audio segment deleted.")
 
         # Save the updated SRT file
-        return "\n".join(format_srt_lines(subtitles))
+        return format_srt(subtitles)
 
     except Exception as e:
         L.error(f"Error processing files: {e}")
