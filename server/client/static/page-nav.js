@@ -1,5 +1,8 @@
 import StyleGlobal from "style-global" with { type: "css" };
 import StylePageNav from "style-page-nav" with { type: "css" };
+import {
+  enrich_all, enrich_edits, enrich_sounds 
+} from "api";
 
 class PageNav extends HTMLElement {
 
@@ -26,7 +29,26 @@ class PageNav extends HTMLElement {
         this.shadowRoot.getElementById("main"), () => {
           const host = this.getRootNode().host;
           this.sendCustomEvent("srt-page/enrich", {
-            id: host.getAttribute("id")
+            id: host.getAttribute("id"),
+            api_method: enrich_all
+          })
+        }
+      ],
+      [
+        this.shadowRoot.getElementById("edits"), () => {
+          const host = this.getRootNode().host;
+          this.sendCustomEvent("srt-page/enrich", {
+            id: host.getAttribute("id"),
+            api_method: enrich_edits
+          })
+        }
+      ],
+      [
+        this.shadowRoot.getElementById("sounds"), () => {
+          const host = this.getRootNode().host;
+          this.sendCustomEvent("srt-page/enrich", {
+            id: host.getAttribute("id"),
+            api_method: enrich_sounds
           })
         }
       ],

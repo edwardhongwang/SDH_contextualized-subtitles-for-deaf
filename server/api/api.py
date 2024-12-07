@@ -86,6 +86,36 @@ def none_to_all_sdh_transcript(
 
 
 @sdh_api.post(
+    "/api/enrich/{listing}/edits"
+)
+def none_to_all_sdh_transcript(
+    transcript: Annotated[str, Depends(
+        enrichers[("edits",)][()]
+    )]
+):
+    ''' From Plain to Edits '''
+    try:
+        return transcript
+    except TranscriptError:
+        raise HTTPException(status_code=404, detail="No listing")
+
+
+@sdh_api.post(
+    "/api/enrich/{listing}/sounds"
+)
+def none_to_all_sdh_transcript(
+    transcript: Annotated[str, Depends(
+        enrichers[("sounds",)][()]
+    )]
+):
+    ''' From Plain to Sounds '''
+    try:
+        return transcript
+    except TranscriptError:
+        raise HTTPException(status_code=404, detail="No listing")
+
+
+@sdh_api.post(
     "/api/enrich/{listing}/edits+sounds+emotions"
 )
 def none_to_all_sdh_transcript(

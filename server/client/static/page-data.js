@@ -1,7 +1,7 @@
 import StyleGlobal from "style-global" with { type: "css" };
 import StylePageData from "style-page-data" with { type: "css" };
 import { root, get_info, get_image } from "api";
-import { make_plain, enrich_all } from "api";
+import { make_plain } from "api";
 
 class PageData extends HTMLElement {
 
@@ -71,7 +71,7 @@ class PageData extends HTMLElement {
         const transcript_state = this.getAttribute(
           "transcript_state"
         ).split(" ");
-        enrich_all(
+        detail.api_method(
           root, listing, transcript, transcript_state
         ).then(({lines, transcript_state}) => {
           this.setAttribute("transcript_state", 
