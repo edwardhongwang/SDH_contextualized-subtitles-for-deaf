@@ -5,7 +5,7 @@ import { PagePane } from "page-pane";
 import { PageNav } from "page-nav";
 
 const valid_events = new Set([
-  "srt-lines/redraw",
+  "srt-page/enrich",
   "srt-pages/new"
 ])
 
@@ -27,8 +27,8 @@ const index = (user) => {
   customElements.define(
     "page-pane", (
       inherit(PagePane, [
-        "lines", "id", "label", "source",
-        "image", "header"
+        "lines", "transcript_state", "id",
+        "label", "source", "image", "header"
       ])
     )
   );

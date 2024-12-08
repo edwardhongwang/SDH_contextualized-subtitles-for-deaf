@@ -6,9 +6,6 @@ class PagePane extends HTMLElement {
   static observedAttributes = [
     "lines"
 ];
-  static eventHandlerKeys = [
-    "srt-lines/redraw"
-  ];
 
   constructor() {
     super();

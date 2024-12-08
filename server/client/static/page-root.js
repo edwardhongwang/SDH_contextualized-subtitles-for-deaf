@@ -31,6 +31,7 @@ class PageRoot extends HTMLElement {
         const { id } = detail;
         const old_page_data = this.shadowRoot.getElementById(id);
         const new_page_data = document.createElement("page-data");
+        new_page_data.setAttribute("transcript_state", "");
         new_page_data.setAttribute("lines", "[]");
         new_page_data.setAttribute(
           "listing", old_page_data.getAttribute("listing")

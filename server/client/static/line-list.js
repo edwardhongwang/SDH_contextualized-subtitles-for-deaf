@@ -21,7 +21,6 @@ class LineList extends HTMLElement {
     const lines = this.getAttribute("lines");
     const items = document.createElement("div"); 
     JSON.parse(lines).forEach(line => {
-      console.log(line);
       const el = document.createElement("div"); 
       el.innerText = line.text;
       items.appendChild(el);
