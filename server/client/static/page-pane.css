@@ -23,5 +23,8 @@
       font-weight: var(--title-weight);
       font-family: var(--font-display);
     }
+    > img {
+      max-width: 95%;
+    }
   }
 }

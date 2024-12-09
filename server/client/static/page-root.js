@@ -33,6 +33,7 @@ class PageRoot extends HTMLElement {
         const new_page_data = document.createElement("page-data");
         new_page_data.setAttribute("transcript_state", "");
         new_page_data.setAttribute("lines", "[]");
+        new_page_data.setAttribute("clip_id", "0");
         new_page_data.setAttribute(
           "listing", old_page_data.getAttribute("listing")
         );

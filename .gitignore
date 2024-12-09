@@ -17,9 +17,14 @@ data/**/*
 # Ignore logfiles
 tests/debug.*
 tests/error.*
-# Ignore integration artefacts
+# Ignore integration artifacts
 tests/integration/**/*.srt
 tests/**/temp.srt
 tests/**/*.txt
-# Ignore chat artefact
+# Ignore chat artifact
 server/client/static/**/*.txt
+# Ignore figure artifacts
+figures/TVSM-*
+figures/__MACOSX
+# Keep figure files
+!server/client/static/**/*.wav

@@ -1,3 +1,4 @@
+import yaml
 import logging
 from pathlib import Path
 from datetime import timedelta
@@ -10,7 +11,7 @@ from src import use_speech_to_text_engine
 from src import use_llm_proofreader
 from src import use_sound_describer
 from utils import parse_srt, format_srt
-from utils import load_config
+from utils import load_config, to_server_constants
 
 
 class TranscriptLine(BaseModel):
@@ -30,24 +31,21 @@ class Transcript(RootModel):
         return self.root[item]
 
 
-class TranscriptError(Exception):
+class ListingError(Exception):
     pass
 
 
 @lru_cache
-def find_listing(listing):
-    if not listing:
-        raise TranscriptError()
-    folder = Path(listing).resolve().parts[-1]
-    static = Path("server/client/static")
-    input_folder = static / folder
-    audio_path = input_folder / "voice.mp3"
-    if not input_folder.is_dir():
-        raise TranscriptError()
+def find_listing(listing, clip_id):
+    if not listing or clip_id is None:
+        raise ListingError()
+    constants = to_server_constants()
+    listing_name = Path(listing).resolve().parts[-1]
+    audio_path = find_audio_file(listing_name, clip_id)
     if not audio_path.is_file():
-        raise TranscriptError()
-    # Return input folder and audio path
-    return input_folder, audio_path
+        raise ListingError()
+    # Return audio path
+    return audio_path
 
 
 @lru_cache
@@ -77,15 +75,32 @@ def add_sounds(transcript, audio_path):
     )
 
 
+@lru_cache
+def find_info(listing):
+    constants = to_server_constants()
+    listing_name = Path(listing).resolve().parts[-1]
+    static = Path(constants["client"]["audio_root"])
+    folder = static / listing_name
+    return yaml.safe_load(open(folder / "info.yaml"))
+
+
+@lru_cache
+def find_audio_file(listing, clip_id):
+    constants = to_server_constants()
+    listing_name = Path(listing).resolve().parts[-1]
+    static = Path(constants["client"]["audio_root"])
+    input_folder = static / listing_name / str(clip_id)
+    ext = find_info(listing_name).get("ext", "wav")
+    return input_folder / f"voice.{ext}"
+
+
 class TranscriptMaker:
 
     def __init__(self, add:set[str]):
         self.need = lambda key: key in add
 
-    def __call__(self, listing: str):
-        input_folder, audio_path = find_listing(
-            listing
-        )
+    def __call__(self, listing: str, clip_id: int):
+        audio_path = find_listing(listing, clip_id)
         # Handle creation from scratch
         transcript = make_new_transcript(audio_path)
         if self.need("edits"):
@@ -103,10 +118,10 @@ class TranscriptEnricher:
     def __init__(self, add:set[str], has:set[str]):
         self.need = lambda key: key in (add-has)
 
-    def __call__(self, listing: str, transcript: Transcript):
-        input_folder, audio_path = find_listing(
-            listing
-        )
+    def __call__(
+        self, listing: str, clip_id: int, transcript: Transcript
+    ):
+        audio_path = find_listing(listing, clip_id)
         # Serialize transcript
         transcript = format_srt(transcript.model_dump())
         # Handle updates to existing transcript
