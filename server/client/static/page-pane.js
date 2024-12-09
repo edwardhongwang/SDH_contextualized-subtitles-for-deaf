@@ -4,8 +4,8 @@ import StylePagePane from "style-page-pane" with { type: "css" };
 class PagePane extends HTMLElement {
 
   static observedAttributes = [
-    "lines"
-];
+    "lines", "image"
+  ];
 
   constructor() {
     super();
@@ -41,8 +41,13 @@ class PagePane extends HTMLElement {
   }
 
   attributeChangedCallback(key, _, value) {
+    const img_el = this.shadowRoot.querySelector("img");
     if (key == "lines") {
       this.renderLineList(this.shadowRoot);
+    }
+    else if (key == "image" && img_el) {
+      const image = this.getAttribute("image");
+      img_el.src = this.getAttribute("image");
     }
   }
 }

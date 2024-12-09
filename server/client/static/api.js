@@ -1,24 +1,28 @@
-const make_plain = async (root, listing) => {
+const make_plain = async (root, listing, clip_id) => {
+  const listing_path = get_listing_path(
+    listing, clip_id, [], []
+  );
   return (
-    await (await fetch(`${root}/make/${listing}`)).json()
+    await (
+      await fetch(
+        `${root}/make/${listing_path}`
+      )
+    ).json()
   )
 }
 
 const enrich = (transcript_state) => {
   return async (
-    root, listing, transcript, old_transcript_state=[]
+    root, listing, clip_id, transcript, old_transcript_state=[]
   ) => {
     const must_add = transcript_state.filter(
       key => !old_transcript_state.includes(key)
     );
-    const parts = [
-      listing, old_transcript_state.join('/'),
-      must_add.join('+')
-    ].filter(
-      (part, index) => index !== 1 || part !== ''
-    ).join('/');
+    const listing_path = get_listing_path(
+      listing, clip_id, old_transcript_state, must_add
+    );
     const lines = (
-      await (await fetch(`${root}/enrich/${parts}`, {
+      await (await fetch(`${root}/enrich/${listing_path}`, {
         method: "POST", body: JSON.stringify(transcript),
         headers: {
           "Content-Type": "application/json",
@@ -37,7 +41,9 @@ const enrich_all = enrich([
 const enrich_edits = enrich([ "edits" ]);
 const enrich_sounds = enrich([ "sounds" ]);
 
-const get_info = async (root, listing, width) => {
+const get_info = async (
+  root, listing, clip_id, transcript_state, width
+) => {
   const info = (
     await (await fetch(`${root}/info/${listing}`)).json()
   )
@@ -48,7 +54,14 @@ const get_info = async (root, listing, width) => {
   const header = (
     title_el.querySelector('.wikibase-title-label')
   ).innerText;
-  const image = await get_image(parse, width);
+  const has_figure = !isNaN(parseInt(info["figure"]));
+  const image = has_figure ? (
+    await get_figure_image(
+      root, listing, clip_id, transcript_state
+    )
+  ) : (
+    await get_thumb_image(parse, width)
+  )
   return { ...info, header, image };
 }
 
@@ -61,17 +74,38 @@ const get_entity = async (speaker) => {
   return parse;
 }
 
-const get_image = async (parse, width) => {
+const get_thumb_image = async (parse, width) => {
 
   const thumb = "https://commons.wikimedia.org/w/thumb.php"
   const image_file = (parse.images || [])[0];
   return `${thumb}?width=${width}&f=${image_file}`;
 }
 
+const get_figure_image = async (
+  root, listing, clip_id, transcript_state=[]
+) => {
+  const listing_path = get_listing_path(
+    listing, clip_id, transcript_state, []
+  );
+  console.log(listing_path);
+  return `${root}/figure/${listing_path}/figure.png`;
+}
+
+const get_listing_path = (
+  listing, clip_id, transcript_state, must_add
+) => {
+  return [
+    listing, clip_id, transcript_state.join('/'),
+    must_add.join('+')
+  ].filter(
+    (part, index) => part !== ''
+  ).join('/');
+}
+
 const root = "http://localhost:7777/api";
 
 export {
-  get_info, root, get_image,
+  get_info, root,
   make_plain, enrich_all,
   enrich_edits, enrich_sounds
 }

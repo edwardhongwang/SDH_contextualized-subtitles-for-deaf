@@ -1,6 +1,5 @@
 import asyncio
 import uvicorn
-from utils import to_server_constants
 
 
 def to_server(port, scope, module, log_level):
