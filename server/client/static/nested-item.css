@@ -1,0 +1,17 @@
+:host {
+  display: grid;
+  button {
+    display: grid;
+    font-size: 1em;
+    cursor: pointer;
+    gap: var(--gap-small);
+    color: hwb(var(--white));
+    background-color: hwb(var(--dark));
+    border: var(--main-border);
+    font-family: var(--font-content);
+    font-weight: var(--button-weight);
+    text-shadow: var(--button-text-shadow);
+    border-radius: var(--button-border-radius);
+    padding: var(--gap-small);
+  }
+}

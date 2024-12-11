@@ -1,0 +1,34 @@
+:host {
+  z-index: 1000;
+  padding: var(--gap-average);
+  overflow: scroll;
+  border: var(--light-border);
+  background-color: hwb(var(--black));
+  border-radius: var(--pane-border-radius);
+  box-shadow: var(--main-shadow);
+  > :not(button) {
+    padding: var(--gap-average) 0;
+    width: 100%;
+  }
+  button {
+    font-size: 1em;
+    cursor: pointer;
+    gap: var(--gap-small);
+    color: hwb(var(--white));
+    border: var(--error-border);
+    background-color: hwb(var(--dark-error));
+    font-family: var(--font-content);
+    font-weight: var(--button-weight);
+    text-shadow: var(--button-text-shadow);
+    border-radius: var(--button-border-radius);
+    padding: var(--gap-small);
+  }
+}
+:host(.hidden) {
+  display: none;
+}
+:host([empty]) {
+  button {
+    display: none;
+  }
+}

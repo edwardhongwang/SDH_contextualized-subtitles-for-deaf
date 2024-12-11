@@ -7,6 +7,7 @@ __pycache__/
 deepgram-python-captions/
 
 *.mp4
+*.mp3
 venv/
 *.wav
 *.dylib
@@ -21,10 +22,11 @@ tests/error.*
 tests/integration/**/*.srt
 tests/**/temp.srt
 tests/**/*.txt
+!tests/**/*.mp3
 # Ignore chat artifact
-server/client/static/**/*.txt
+server/api/data/**/*.txt
 # Ignore figure artifacts
 figures/TVSM-*
 figures/__MACOSX
 # Keep figure files
-!server/client/static/**/*.wav
+!server/api/**/*.mp3

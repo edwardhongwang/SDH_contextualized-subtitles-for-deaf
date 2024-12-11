@@ -1,3 +1,7 @@
+import { PageWrapper } from "page-wrapper";
+import { NestedItem } from "nested-item";
+import { NestedList } from "nested-list";
+import { PageList } from "page-list";
 import { LineList } from "line-list";
 import { PageRoot } from "page-root";
 import { PageData } from "page-data";
@@ -5,16 +9,22 @@ import { PagePane } from "page-pane";
 import { PageNav } from "page-nav";
 
 const valid_events = new Set([
+  "srt-pages/select",
   "srt-page/enrich",
+  "srt-page/undo",
   "srt-pages/new"
 ])
 
 const index = (user) => {
+  // Wrapper
+  customElements.define(
+    "page-wrapper", eventReceiver(
+      PageWrapper, PageWrapper.eventHandlerKeys
+    )
+  );
   // Pages
   customElements.define(
-    "page-root", eventReceiver(
-      PageRoot, PageRoot.eventHandlerKeys
-    )
+    "page-root", PageRoot
   );
   // Page
   customElements.define(
@@ -27,8 +37,9 @@ const index = (user) => {
   customElements.define(
     "page-pane", (
       inherit(PagePane, [
-        "lines", "transcript_state", "id",
-        "label", "source", "image", "header"
+        "lines", "transcript_state", "id", "clip_id",
+        "label", "source", "header", "figure_src",
+        "speaker_src"
       ])
     )
   );
@@ -42,6 +53,11 @@ const index = (user) => {
   customElements.define(
     "page-nav", eventSender(PageNav)
   );
+  customElements.define(
+    'nested-item', eventSender(NestedItem)
+  );
+  customElements.define('nested-list', NestedList);
+  customElements.define('page-list', PageList);
 };
 
 

@@ -1,0 +1,28 @@
+:host {
+  display: grid;
+  gap: var(--gap-average);
+  > details {
+    > summary {
+      cursor: pointer;
+      color: hwb(var(--white));
+      border: var(--main-border);
+      background-color: hwb(var(--dark-main));
+      box-shadow: var(--main-shadow);
+      font-family: var(--font-display);
+      font-weight: var(--button-weight);
+      text-shadow: var(--button-text-shadow);
+      border-radius: var(--button-border-radius);
+      padding: var(--gap-average) var(--gap-small);
+    }
+    > div {
+      display: grid;
+      gap: var(--gap-small);
+      grid-template-columns: repeat(
+        auto-fill, minmax(4em, 1fr)
+      );
+      margin-left: var(--gap-average);
+      padding-left: var(--gap-average);
+      padding: var(--gap-average) 0;
+    }
+  }
+}

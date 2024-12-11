@@ -1,6 +1,6 @@
 api:
   port: 7777
+  audio_root: "server/api/data"
+  figure_root: "server/api/figures"
 client:
   port: 8888
-  audio_root: "server/client/static/data"
-  figure_root: "server/client/static/figures"

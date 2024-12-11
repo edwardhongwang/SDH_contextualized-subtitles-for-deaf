@@ -1,0 +1,13 @@
+:host {
+  width: 100%;
+  display: grid;
+  color: hwb(var(--light));
+  font-weight: var(--weight-content);
+  font-family: var(--font-content);
+  grid-template-columns: 1fr;
+  grid-template-rows: 1fr;
+  > * {
+    grid-column: 1;
+    grid-row: 1;
+  }
+}

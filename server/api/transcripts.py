@@ -12,6 +12,7 @@ from src import use_llm_proofreader
 from src import use_sound_describer
 from utils import parse_srt, format_srt
 from utils import load_config, to_server_constants
+from .info import find_info
 
 
 class TranscriptLine(BaseModel):
@@ -54,7 +55,7 @@ def make_new_transcript(audio_path):
     config = load_config(L, Path('config'))
     return use_speech_to_text_engine(
         L, config, audio_path, stt_engine="deepgram"
-    )
+    ).split('```')[0]
 
 
 @lru_cache
@@ -63,7 +64,7 @@ def add_edits(transcript):
     config = load_config(L, Path('config'))
     return use_llm_proofreader(
         L, config, transcript
-    )
+    ).split('```')[0]
 
 
 @lru_cache
@@ -72,25 +73,16 @@ def add_sounds(transcript, audio_path):
     config = load_config(L, Path('config'))
     return use_sound_describer(
         L, config, transcript, audio_path
-    )
-
-
-@lru_cache
-def find_info(listing):
-    constants = to_server_constants()
-    listing_name = Path(listing).resolve().parts[-1]
-    static = Path(constants["client"]["audio_root"])
-    folder = static / listing_name
-    return yaml.safe_load(open(folder / "info.yaml"))
+    ).split('```')[0]
 
 
 @lru_cache
 def find_audio_file(listing, clip_id):
     constants = to_server_constants()
     listing_name = Path(listing).resolve().parts[-1]
-    static = Path(constants["client"]["audio_root"])
-    input_folder = static / listing_name / str(clip_id)
-    ext = find_info(listing_name).get("ext", "wav")
+    audio_root = Path(constants["api"]["audio_root"])
+    input_folder = audio_root / listing_name / str(clip_id)
+    ext = find_info(listing_name)[1].get("ext", "wav")
     return input_folder / f"voice.{ext}"
 
 
