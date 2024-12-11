@@ -1,10 +1,6 @@
 :host {
-  width: 100%;
   display: grid;
-  color: hwb(var(--light));
   gap: var(--gap-small);
-  font-weight: var(--weight-content);
-  font-family: var(--font-content);
   grid-template-columns: 1fr;
   grid-auto-rows: auto;
   > * {
@@ -13,7 +9,7 @@
   }
 }
 /* must be > var(--pane-min) + var(nav-wide) */
-@media (min-width: 525px) {
+@media (min-width: 580px) {
   :host {
     grid-template-columns: repeat(
       auto-fill, minmax(var(--nav-wide), 1fr)

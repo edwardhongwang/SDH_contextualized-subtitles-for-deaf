@@ -41,6 +41,16 @@ const enrich_all = enrich([
 const enrich_edits = enrich([ "edits" ]);
 const enrich_sounds = enrich([ "sounds" ]);
 
+const index_info = async (root) => {
+  const info_index = (
+    await (await fetch(`${root}/index/info`)).json()
+  )
+  return info_index.map(info => {
+    const { listing, label, clip_count } = info;
+    return { listing, label, clip_count };
+  })
+}
+
 const get_info = async (
   root, listing, clip_id, transcript_state, width
 ) => {
@@ -54,15 +64,20 @@ const get_info = async (
   const header = (
     title_el.querySelector('.wikibase-title-label')
   ).innerText;
-  const has_figure = !isNaN(parseInt(info["figure"]));
-  const image = has_figure ? (
+  const has_figure = !isNaN(parseInt(info.figure));
+  const figure_src = has_figure ? (
     await get_figure_image(
       root, listing, clip_id, transcript_state
     )
-  ) : (
+  ) : null;
+  const speaker_src = (
     await get_thumb_image(parse, width)
-  )
-  return { ...info, header, image };
+  );
+  return { 
+    ...info, header, images : {
+      figure_src, speaker_src
+    } 
+  };
 }
 
 const get_entity = async (speaker) => {
@@ -78,6 +93,9 @@ const get_thumb_image = async (parse, width) => {
 
   const thumb = "https://commons.wikimedia.org/w/thumb.php"
   const image_file = (parse.images || [])[0];
+  if (!image_file) {
+    return "./static/no-speaker.png";
+  }
   return `${thumb}?width=${width}&f=${image_file}`;
 }
 
@@ -87,7 +105,6 @@ const get_figure_image = async (
   const listing_path = get_listing_path(
     listing, clip_id, transcript_state, []
   );
-  console.log(listing_path);
   return `${root}/figure/${listing_path}/figure.png`;
 }
 
@@ -105,7 +122,7 @@ const get_listing_path = (
 const root = "http://localhost:7777/api";
 
 export {
-  get_info, root,
+  get_info, index_info, root,
   make_plain, enrich_all,
   enrich_edits, enrich_sounds
 }

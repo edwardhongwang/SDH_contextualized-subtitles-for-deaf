@@ -10,9 +10,10 @@ from starlette.requests import Request
 import yaml
 from fastapi import Depends, FastAPI
 from contextlib import asynccontextmanager
+from .info import InfoFinder, InfoLine, InfoError
+from .info import InfoIndexer, InfoIndex
 from .figures import figure_makers, FigureError
 from .transcripts import makers, enrichers
-from utils import to_server_constants
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
@@ -45,11 +46,6 @@ async def validation_exception_handler(request: Request, exc: RequestValidationE
     return JSONResponse(content=content, status_code=_422)
 
 
-@sdh_api.get("/api")
-def open_root_api(constants=Depends(to_server_constants)):
-    return constants 
-
-
 @sdh_api.get("/api/figure/{listing}/{clip_id}/figure.png")
 def make_plain_figure(
     figure: Annotated[str, Depends(
@@ -67,6 +63,19 @@ def make_plain_figure(
 def make_edits_figure(
     figure: Annotated[str, Depends(
         figure_makers[("edits",)]
+    )]
+):
+    ''' Edits only '''
+    try:
+        return StreamingResponse(content=figure, media_type="image/png")
+    except FigureError:
+        raise HTTPException(status_code=404, detail="No listing clip")
+
+
+@sdh_api.get("/api/figure/{listing}/{clip_id}/sounds/figure.png")
+def make_sounds_figure(
+    figure: Annotated[str, Depends(
+        figure_makers[("sounds",)]
     )]
 ):
     ''' Edits only '''
@@ -175,15 +184,21 @@ def enrich_with_all(
         raise HTTPException(status_code=404, detail="No listing")
 
 
+@sdh_api.get("/api/index/info")
+def sdh_info_index(
+    info_index: Annotated[InfoLine, Depends(InfoIndexer())]
+):
+    try:
+        return info_index
+    except InfoError:
+        raise HTTPException(status_code=404, detail="No index")
+
+
 @sdh_api.get("/api/info/{listing}")
 def sdh_info(
-    listing, constants=Depends(to_server_constants)
+    info_line: Annotated[InfoLine, Depends(InfoFinder())]
 ):
-    # TODO make more robust against malicious users
-    folder = Path(listing).resolve().parts[-1]
-    static = Path(constants["client"]["audio_root"])
-    input_folder = static / folder
-    info_path = input_folder / "info.yaml"
-    if not input_folder.is_dir() or not info_path.is_file():
-        return {} #TODO 
-    return yaml.safe_load(open(info_path))
+    try:
+        return info_line
+    except InfoError:
+        raise HTTPException(status_code=404, detail="No listing")

@@ -13,8 +13,10 @@
     height: 100%;
     display: grid;
     overflow: scroll;
-    align-items: center;
+    align-items: start;
     justify-items: center;
+    grid-template-rows: 3.5em 3em auto auto;
+    grid-template-columns: 1fr auto 1fr;
     border: var(--light-border);
     background-color: hwb(var(--black));
     border-radius: var(--pane-border-radius);
@@ -22,9 +24,37 @@
     h1,h2,h3,h4,h5,h6 {
       font-weight: var(--title-weight);
       font-family: var(--font-display);
+      margin: 0;
+    }
+    > h2 {
+      grid-row: 1;
+      grid-column: 1 / -1;
+      align-self: center;
+    }
+    > h3 {
+      grid-row: 2;
+      grid-column: 1;
+      justify-self: start;
+      padding: 0 var(--gap-average);
+    }
+    > h3::before {
+      content: 'Clip ';
+    }
+    > h4 {
+      grid-row: 2;
+      grid-column: 3;
+      justify-self: end;
+      padding: 0 var(--gap-average);
     }
     > img {
       max-width: 95%;
+      grid-column: 1/-1;
+      margin-bottom: var(--gap-average);
+      grid-row: 4;
+    }
+    > *:last-child {
+      grid-column: 1/-1;
+      grid-row: 3;
     }
   }
 }

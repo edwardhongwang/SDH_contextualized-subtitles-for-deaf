@@ -41,7 +41,11 @@
         min-height: 80vh;
         gap: 40px 0; 
         > * {
-          grid-column: 2
+          grid-column: 2;
+          grid-row: 1;
+        }
+        > .footer {
+          grid-row: 2;
         }
       }
     </style>
@@ -50,9 +54,16 @@
         "imports": {
           "api": "/static/api.js",
           "index": "/static/index.js",
+          "page-wrapper": "/static/page-wrapper.js",
+          "style-page-wrapper": "/static/page-wrapper.css",
           "page-root": "/static/page-root.js",
-          "sound-counts": "/static/sound-counts.js",
           "style-page-root": "/static/page-root.css",
+          "nested-list": "/static/nested-list.js",
+          "style-nested-list": "/static/nested-list.css",
+          "nested-item": "/static/nested-item.js",
+          "style-nested-item": "/static/nested-item.css",
+          "page-list": "/static/page-list.js",
+          "style-page-list": "/static/page-list.css",
           "page-data": "/static/page-data.js",
           "style-page-data": "/static/page-data.css",
           "page-pane": "/static/page-pane.js",
@@ -61,7 +72,8 @@
           "style-page-nav": "/static/page-nav.css",
           "line-list": "/static/line-list.js",
           "style-line-list": "/static/line-list.css",
-          "style-global": "/static/global.css"
+          "style-global": "/static/global.css",
+          "sound-counts": "/static/sound-counts.js"
         }
       }
     </script>
@@ -72,11 +84,12 @@
 
   </head>
   <body>
-    <page-root></page-root>
+    <page-wrapper><page-wrapper>
     <div class="footer">© 2024</div>
+    <template id="page-wrapper-view">
+      <page-list empty></page-list>
+    </template>
     <template id="page-root-view">
-      <page-data listing="fox" clip_id="0" lines="[]" transcript_state="">
-      </page-data>
     </template>
     <template id="page-data-view">
       <page-pane></page-pane>
@@ -84,6 +97,7 @@
     </template>
     <template id="page-pane-view">
       <div>
+        <h2></h2>
         <h3></h3>
         <h4></h4>
         <img src="">
@@ -112,6 +126,15 @@
       <button id="new">
         <span>New</span>
       </button>
+    </template>
+    <template id="page-list-view">
+      <button>Back</button>
+    </template>
+    <template id="nested-list-view">
+      <details>
+        <summary></summary>
+        <div></div>
+      </details>
     </template>
   </body>
 </html>

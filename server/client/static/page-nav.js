@@ -55,7 +55,15 @@ class PageNav extends HTMLElement {
       [
         this.shadowRoot.getElementById("new"), () => {
           const host = this.getRootNode().host;
-          this.sendCustomEvent("srt-pages/new", { 
+          this.sendCustomEvent("srt-pages/select", { 
+            listing: host.getAttribute("listing")
+          })
+        }
+      ],
+      [
+        this.shadowRoot.getElementById("undo"), () => {
+          const host = this.getRootNode().host;
+          this.sendCustomEvent("srt-page/undo", { 
             id: host.getAttribute("id")
           })
         }
