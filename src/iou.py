@@ -9,7 +9,6 @@ from fractions import Fraction
 from datetime import timedelta
 from pathlib import Path
 from random import sample
-import soundfile as sf
 import numpy as np
 
 
@@ -66,9 +65,9 @@ def to_intersection_and_union(
         parse_srt(transcript), timedelta(seconds=0),
         duration_time 
     )
-    samplerate = sf.read(audio_path)[1]
-    intersections = np.sum(truth & automated) / samplerate
-    unions = np.sum(truth | automated) / samplerate
+    # The vectorized transcripts are in milliseconds
+    intersections = np.sum(truth & automated) / 1000 
+    unions = np.sum(truth | automated) / 1000 
     return intersections, unions
 
 
