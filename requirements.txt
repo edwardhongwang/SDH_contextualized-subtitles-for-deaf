@@ -8,5 +8,5 @@ fastapi==0.115.6
 pytest==8.3.4
 openai==1.55.3
 srt==3.5.3
-tvsm-extractor==1.0.0
+tvsm-extractor==2.1.0
 soundfile==0.12.1

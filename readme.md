@@ -91,6 +91,24 @@ python main.py --input video.mp4 --output subtitles.srt
 python main.py --input audio.mp3 --output subtitles.srt
 ```
 
+### Running Webserver
+
+```bash
+python main.py serve
+```
+
+### Creating IOU plots
+
+```bash
+python main.py iou ansari 
+```
+
+or
+
+```bash
+python main.py iou fox
+```
+
 ### Running Tests
 
 List all categories of tests
@@ -120,9 +138,9 @@ python main.py tests
 ```bash
 python main.py --input video.mp4 \
                --output subtitles.srt \
-               --stt-engine whisper \
+               --stt-engine groq \
                --emotion-detection enabled \
-               --sound-description detailed
+               --sound-description enabled 
 ```
 
 ### Configuration Options
@@ -135,17 +153,27 @@ Edit `config/config.yaml` to customize:
 
 Example configuration:
 ```yaml
-stt:
-  primary_engine: "google"
-  confidence_threshold: 0.85
+deepgram:
+  model: nova-2
 
+openai:
+  model: o1-mini
+
+groq:
+  temperature: 0
+  model: distil-whisper-large-v3-en
+
+stt:
+  primary_engine: "deepgram"
+
+# TODO
 emotion:
   detection_enabled: true
   intensity_threshold: 0.6
 
-sound:
-  description_detail: "detailed"
-  min_volume_threshold: -30
+sounds:
+  min_gap_duration: 1.5 
+  context_lines: 4
 ```
 
 ## Output Format

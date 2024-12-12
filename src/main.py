@@ -2,7 +2,7 @@ from .speech_transcriber import SpeechTranscriber
 from .sound_description import non_speech_labeling
 from .file_names import to_proofread_transcript_path
 from .file_names import to_described_transcript_path
-from .errors import APIError
+from .errors import APIError, TranscriptError 
 
 
 def use_sound_describer(
@@ -27,14 +27,14 @@ def use_speech_to_text_engine(
             return transcriber.transcribe_deepgram(
                 audio_path
             )
-        except UncategorizedError as e:
+        except (FileNotFoundError, APIError, TranscriptError) as e:
             L.error(e)
-            assert False
+            return None
     elif stt_engine == "groq":
         return transcriber.transcribe_groq(
             audio_path
         )
-    assert False
+    L.error(f'Unknown STT Engine: "{stt_engine}"')
 
 
 def use_llm_proofreader(
@@ -51,12 +51,17 @@ def main(
     L, config, audio_path, transcript_path,
     stt_engine, describe_sounds
 ):
+    write_output = transcript_path is not None
+
     # Run speech transcriber ( Groq or Deepgram )
     transcript = use_speech_to_text_engine(
         L, config, audio_path, stt_engine
     )
+    if transcript is None:
+        L.error("Unable to transcribe.")
+        return None
     # Write if output path provided
-    if transcript_path is not None:
+    if write_output:
         with open(transcript_path, 'w') as wf:
             wf.write(transcript)
 
@@ -64,13 +69,19 @@ def main(
     proofread_transcript = use_llm_proofreader(
         L, config, transcript
     )
+    bypass_proofreader = proofread_transcript is None
     # Write if output path provided
-    if transcript_path is not None:
+    if write_output and not bypass_proofreader:
         proofread_transcript_path = to_proofread_transcript_path(
             transcript_path
         )
         with open(proofread_transcript_path, "w") as wf:
             wf.write(proofread_transcript)
+
+    # Bypass failed LLM proofreading
+    if bypass_proofreader:
+        L.warning("Skipping failed LLM proofreading")
+        proofread_transcript = transcript
     
     # Skip sound descriptions
     if not describe_sounds:
@@ -81,7 +92,7 @@ def main(
         L, config, proofread_transcript, audio_path
     )
     # Write if output path provided
-    if transcript_path is not None:
+    if write_output:
         described_transcript_path = to_described_transcript_path(
             proofread_transcript_path
         )

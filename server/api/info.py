@@ -1,13 +1,16 @@
 import yaml
 from pathlib import Path
 from typing import Optional
-from functools import lru_cache 
 from pydantic import BaseModel
 from pydantic import RootModel
 from fastapi import Depends
 from typing import List
 
-from utils import load_config, to_server_constants
+from data_utils import (
+    find_listing_info, find_audio_listings,
+    trim_listing_name
+)
+from utils import load_config
 
 
 class InfoLine(BaseModel):
@@ -33,21 +36,10 @@ class InfoError(Exception):
     pass
 
 
-@lru_cache
-def find_info(listing):
-    constants = to_server_constants()
-    listing_name = Path(listing).resolve().parts[-1]
-    audio_root = Path(constants["api"]["audio_root"])
-    folder = audio_root / listing_name
-    return (
-        listing_name,
-        yaml.safe_load(open(folder / "info.yaml"))
-    )
-
-
 def to_info_line(listing):
     try:
-        listing_name, info = find_info(listing)
+        listing_name = trim_listing_name(listing)
+        info = find_listing_info(listing)
     except FileNotFoundError:
         raise InfoError()
     return InfoLine(**{
@@ -78,19 +70,23 @@ class InfoIndexer:
         pass
 
     def __call__(
-        self, constants=Depends(to_server_constants)
+        self, listings=Depends(find_audio_listings)
     ):
-        audio_root = Path(
-            constants["api"]["audio_root"]
-        )
-        if not audio_root.is_dir():
-            raise InfoError()
-
-        listings = [
-            str(x) for x in Path(audio_root).iterdir()
-            if x.is_dir()
-        ]
         info_index = []
         for listing in listings:
             info_index.append(to_info_line(listing)) 
         return InfoIndex(info_index)
+
+
+def list_figures():
+    figure_list = []
+    listings = find_audio_listings()
+    try:
+        info_index = InfoIndexer()(listings)
+    except InfoError:
+        return figure_list
+    for idx in info_index:
+        if idx.figure is None:
+            continue
+        figure_list.append(idx.listing)
+    return figure_list 
