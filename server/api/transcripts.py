@@ -10,9 +10,8 @@ from typing import List
 from src import use_speech_to_text_engine
 from src import use_llm_proofreader
 from src import use_sound_describer
-from utils import parse_srt, format_srt
-from utils import load_config, to_server_constants
-from .info import find_info
+from utils import parse_srt, format_srt, load_config
+from data_utils import find_audio_file
 
 
 class TranscriptLine(BaseModel):
@@ -40,7 +39,6 @@ class ListingError(Exception):
 def find_listing(listing, clip_id):
     if not listing or clip_id is None:
         raise ListingError()
-    constants = to_server_constants()
     listing_name = Path(listing).resolve().parts[-1]
     audio_path = find_audio_file(listing_name, clip_id)
     if not audio_path.is_file():
@@ -74,16 +72,6 @@ def add_sounds(transcript, audio_path):
     return use_sound_describer(
         L, config, transcript, audio_path
     ).split('```')[0]
-
-
-@lru_cache
-def find_audio_file(listing, clip_id):
-    constants = to_server_constants()
-    listing_name = Path(listing).resolve().parts[-1]
-    audio_root = Path(constants["api"]["audio_root"])
-    input_folder = audio_root / listing_name / str(clip_id)
-    ext = find_info(listing_name)[1].get("ext", "wav")
-    return input_folder / f"voice.{ext}"
 
 
 class TranscriptMaker:

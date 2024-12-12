@@ -45,6 +45,7 @@ class PageWrapper extends HTMLElement {
         const page_list = this.shadowRoot.querySelector("page-list");
         page_list.openOneListing(detail.listing);
         page_list.className = "";
+        window.scrollTo(0, 0);
       }
     }
   }

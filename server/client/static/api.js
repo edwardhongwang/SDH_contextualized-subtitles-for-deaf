@@ -64,12 +64,9 @@ const get_info = async (
   const header = (
     title_el.querySelector('.wikibase-title-label')
   ).innerText;
-  const has_figure = !isNaN(parseInt(info.figure));
-  const figure_src = has_figure ? (
-    await get_figure_image(
-      root, listing, clip_id, transcript_state
-    )
-  ) : null;
+  const figure_src = await get_figure_image(
+    root, listing, clip_id, transcript_state
+  );
   const speaker_src = (
     await get_thumb_image(parse, width)
   );

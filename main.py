@@ -5,23 +5,62 @@ import asyncio
 import logging
 import argparse
 from pathlib import Path
-from server import run_servers
-from utils import to_server_constants
+from fractions import Fraction
+from server import run_servers, list_figures
+from data_utils import to_server_constants
 from utils import find_test_sets, run_tests
 from utils import extract_audio_from_video
 from utils import setup_logger, load_config
 
 from src import audio_path_to_transcript_path
 from src import create_output_transcript_path
+from src import to_intersections_and_unions
+from src import PlotIOU
 from src import main
 
 
+def float_ratio(value):
+    try:
+        value = float(value)
+        if value < 1/100:
+            raise argparse.ArgumentTypeError(f"{value:.3f} < 1/100")
+        if value > 1:
+            raise argparse.ArgumentTypeError(f"{value:.3f} > 1")
+    except ValueError:
+        raise argparse.ArgumentTypeError(f"{value} is not a number")
+    return value
+
+
 def parse_arguments(L, config, test_commands):
+    commands_without_input_file = (
+        *test_commands, "serve", "iou"
+    )
     parser = argparse.ArgumentParser(
         description="Video subtitle generator", add_help=False
     )
     subparsers = parser.add_subparsers(metavar="command", dest="command")
     subparsers.add_parser("serve", help="run web server")
+
+    # Subcommand "iou"
+    figure_list = list_figures()
+    figure_list_string = ", or ".join(
+        f'"{listing}"' for listing in figure_list
+    )
+    iou_parser = subparsers.add_parser(
+        "iou", help=f'Plot IOU for {figure_list_string}'
+    )
+    iou_parser.add_argument(
+        "listing-name", metavar="dataset",
+        choices=figure_list, help=figure_list_string
+    )
+    iou_parser.add_argument(
+        "output-image", metavar="output image", type=Path,
+        nargs="?", default=None, help="Output path for IOU plot"
+    )
+    iou_parser.add_argument(
+        "--ratio", metavar="clip choice ratio", type=float_ratio,
+        default="0.25", help="Ratio of chosen clips"
+    )
 
     # Subcommand "test"
     test_list = find_test_sets()
@@ -75,7 +114,7 @@ def parse_arguments(L, config, test_commands):
 
     # Require input iff not testing
     if args.input is None:
-        if args.command not in (*test_commands, "serve"):
+        if args.command not in commands_without_input_file:
             parser.error("Please provide an --input video file.")
 
     return args
@@ -97,6 +136,23 @@ def run_main(config):
             constants.get("api", {})["port"],
             constants.get("client", {})["port"]
         ))
+        return
+    elif args.command == "iou":
+        # Plot IOU figures
+        ratio = getattr(args, "ratio")
+        listing_name = getattr(args, "listing-name")
+        frac = Fraction(ratio).limit_denominator(100)
+        png_file = getattr(args, "output-image") or Path(
+            f"iou-{listing_name}-{frac.numerator}-in-{frac.denominator}.png"
+            if ratio < 1 else f"iou-{listing_name}-complete.png"
+        )
+        clip_ids, intersections, unions = to_intersections_and_unions(
+            ratio, listing_name, add=()
+        )
+        with PlotIOU(clip_ids, intersections, unions) as fig: 
+            fig.savefig(
+                png_file, facecolor=fig.get_facecolor()
+            )
         return
     # Otherwise, continue with pipeline
     try:
