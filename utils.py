@@ -6,6 +6,7 @@ from os import devnull
 import yaml
 import pytest
 import logging
+from srt import SRTParseError
 import logging.config
 import glob
 import srt
@@ -185,17 +186,20 @@ def parse_srt(content):
     """Parses the SRT file and returns a list of subtitle entries."""
     subtitles = []
 
-    for match in srt.parse(content):
-        index = match.index 
-        start_time = match.start 
-        end_time = match.end 
-        text = match.content 
-        subtitles.append({
-            'index': index,
-            'start_time': start_time,
-            'end_time': end_time,
-            'text': text
-        })
+    try:
+        for match in srt.parse(content):
+            index = match.index 
+            start_time = match.start 
+            end_time = match.end 
+            text = match.content 
+            subtitles.append({
+                'index': index,
+                'start_time': start_time,
+                'end_time': end_time,
+                'text': text
+            })
+    except SRTParseError:
+        return subtitles
 
     return subtitles
 

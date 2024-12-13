@@ -22,9 +22,8 @@ def trim_listing_name(listing):
 
 @lru_cache
 def find_listing_info(listing):
-    constants = to_server_constants()
+    audio_root = find_audio_root_folder()
     listing_name = trim_listing_name(listing) 
-    audio_root = Path(constants["api"]["audio_root"])
     folder = audio_root / listing_name
     return (
         yaml.safe_load(open(folder / "info.yaml"))

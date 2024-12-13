@@ -1,5 +1,6 @@
 import StyleGlobal from "style-global" with { type: "css" };
 import StylePagePane from "style-page-pane" with { type: "css" };
+import { root, get_audio_url } from "api";
 
 class PagePane extends HTMLElement {
 
@@ -25,11 +26,17 @@ class PagePane extends HTMLElement {
     const copy = template.content.cloneNode(true);
     const img_el = copy.querySelector("img");
     const h2_el = copy.querySelector("h2");
-    const h3_el = copy.querySelector("h3");
     const h4_el = copy.querySelector("h4");
+    const a_el = copy.querySelector("a");
+    const listing = this.getAttribute("listing");
+    const clip_id = this.getAttribute("clip_id");
     h2_el.innerText = this.getAttribute("label");
-    h3_el.innerText = this.getAttribute("clip_id");
     h4_el.innerText = this.getAttribute("header");
+    a_el.innerText = clip_id;
+    a_el.setAttribute(
+      "href", get_audio_url(root, listing, clip_id)
+    );
+    a_el.setAttribute("target", "_blank");
     img_el.src = this.getAttribute("figure_src");
     this.shadowRoot.appendChild(copy);
   }

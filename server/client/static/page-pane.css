@@ -31,13 +31,18 @@
       grid-column: 1 / -1;
       align-self: center;
     }
-    > h3 {
+    > a {
       grid-row: 2;
       grid-column: 1;
       justify-self: start;
+      font-size: 1.5em;
+      text-decoration:none;
+      color: hwb(var(--hyperlink-color));
+      font-weight: var(--title-weight);
+      font-family: var(--font-display);
       padding: 0 var(--gap-average);
     }
-    > h3::before {
+    > a::before {
       content: 'Clip ';
     }
     > h4 {

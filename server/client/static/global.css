@@ -1,4 +1,5 @@
 :host {
+  --hyperlink-color: 210 46% 0.78%;
   --light-action: 240 70% 3.9%;
   --light-main: 190 70% 3.9%;
   --light-error: 350 53% 0%;

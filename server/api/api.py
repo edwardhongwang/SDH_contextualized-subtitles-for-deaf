@@ -5,11 +5,13 @@ from fastapi.exceptions import RequestValidationError
 from fastapi.middleware.cors import CORSMiddleware
 from concurrent.futures import ThreadPoolExecutor
 from fastapi.responses import JSONResponse
+from fastapi.staticfiles import StaticFiles
 from starlette.responses import StreamingResponse
 from starlette.requests import Request
 import yaml
 from fastapi import Depends, FastAPI
 from contextlib import asynccontextmanager
+from data_utils import find_audio_root_folder
 from .info import InfoFinder, InfoLine, InfoError
 from .info import InfoIndexer, InfoIndex
 from .figures import figure_makers, FigureError
@@ -45,6 +47,10 @@ async def validation_exception_handler(request: Request, exc: RequestValidationE
     print(f'{exc}'.replace('\n', ' ').replace('   ', ' '))
     return JSONResponse(content=content, status_code=_422)
 
+
+sdh_api.mount(
+    "/api/audio", StaticFiles(directory=find_audio_root_folder()), name="audio"
+)
 
 @sdh_api.get("/api/figure/{listing}/{clip_id}/figure.png")
 def make_plain_figure(

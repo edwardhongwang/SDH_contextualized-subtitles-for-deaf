@@ -40,6 +40,7 @@ class PageData extends HTMLElement {
       this.setAttribute("lines", JSON.stringify(lines))
     });
     this.setAttribute("clip_id", clip_id);
+    this.setAttribute("listing", listing);
     this.setAttribute("figure_src", figure_src);
     this.setAttribute("speaker_src", speaker_src);
     this.setAttribute("label", info.label);
@@ -55,6 +56,7 @@ class PageData extends HTMLElement {
     const lines = this.getAttribute("lines");
     const figure_src = this.getAttribute("figure_src");
     const speaker_src = this.getAttribute("speaker_src");
+    const listing = this.getAttribute("listing");
     const clip_id = this.getAttribute("clip_id");
     const transcript_state = this.getAttribute(
       "transcript_state"
@@ -64,6 +66,7 @@ class PageData extends HTMLElement {
       pane_el.setAttribute("transcript_state", transcript_state);
       pane_el.setAttribute("figure_src", figure_src);
       pane_el.setAttribute("speaker_src", speaker_src);
+      pane_el.setAttribute("listing", listing);
       pane_el.setAttribute("clip_id", clip_id);
       pane_el.setAttribute("lines", lines);
     }

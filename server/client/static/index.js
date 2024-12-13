@@ -39,7 +39,7 @@ const index = (user) => {
       inherit(PagePane, [
         "lines", "transcript_state", "id", "clip_id",
         "label", "source", "header", "figure_src",
-        "speaker_src"
+        "speaker_src", "listing"
       ])
     )
   );
