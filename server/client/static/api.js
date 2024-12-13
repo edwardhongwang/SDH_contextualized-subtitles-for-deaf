@@ -116,10 +116,17 @@ const get_listing_path = (
   ).join('/');
 }
 
+const get_audio_url = (
+  root, listing, clip_id
+) => {
+  return `${root}/audio/${listing}/${clip_id}/voice.mp3`;
+}
+
 const root = "http://localhost:7777/api";
 
 export {
   get_info, index_info, root,
   make_plain, enrich_all,
-  enrich_edits, enrich_sounds
+  enrich_edits, enrich_sounds,
+  get_audio_url
 }

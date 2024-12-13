@@ -61,6 +61,9 @@ def parse_arguments(L, config, test_commands):
         "--ratio", metavar="clip choice ratio", type=float_ratio,
         default="0.25", help="Ratio of chosen clips"
     )
+    iou_parser.add_argument(
+        "--edits", action='store_true' 
+    )
 
     # Subcommand "test"
     test_list = find_test_sets()
@@ -116,6 +119,14 @@ def parse_arguments(L, config, test_commands):
     if args.input is None:
         if args.command not in commands_without_input_file:
             parser.error("Please provide an --input video file.")
+    else:
+        if args.command in commands_without_input_file:
+            parser.error(f"{args.command} has no --input option.")
+
+    # IOU cannot support groq without edits
+    if args.command == "iou" and args.stt_engine == "groq":
+        if args.edits == False:
+            parser.error(f"The --edits option is required for groq IOU.")
 
     return args
 
@@ -140,16 +151,26 @@ def run_main(config):
     elif args.command == "iou":
         # Plot IOU figures
         ratio = getattr(args, "ratio")
+        use_edits = getattr(args, "edits")
+        stt_engine = getattr(args, "stt_engine")
         listing_name = getattr(args, "listing-name")
         frac = Fraction(ratio).limit_denominator(100)
+        edit_suffix="edited" if use_edits else "plain"
+        suffix=f'{stt_engine}-{edit_suffix}'
+        prefix=f'iou-{listing_name}'
         png_file = getattr(args, "output-image") or Path(
-            f"iou-{listing_name}-{frac.numerator}-in-{frac.denominator}.png"
-            if ratio < 1 else f"iou-{listing_name}-complete.png"
+            f"{prefix}-{frac.numerator}-in-{frac.denominator}-{suffix}.png"
+            if ratio < 1 else f"iou-{listing_name}-complete-{suffix}.png"
         )
         clip_ids, intersections, unions = to_intersections_and_unions(
-            ratio, listing_name, add=()
+            ratio, listing_name, stt_engine, add=(
+                ("edits",) if use_edits else ()
+            )
         )
-        with PlotIOU(clip_ids, intersections, unions) as fig: 
+        iou_plot = PlotIOU(
+            clip_ids, intersections, unions
+        )
+        with iou_plot as fig: 
             fig.savefig(
                 png_file, facecolor=fig.get_facecolor()
             )

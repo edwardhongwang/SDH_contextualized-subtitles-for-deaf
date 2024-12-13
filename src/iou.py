@@ -2,6 +2,7 @@ import logging
 from tvsm_extractor import load_labels, vectorize_transcript 
 from matplotlib import pyplot as plt
 from .main import use_speech_to_text_engine 
+from .main import use_llm_proofreader 
 from utils import load_config, parse_srt
 from data_utils import find_audio_file, find_listing_info
 from data_utils import find_figure_label_folder
@@ -16,14 +17,14 @@ class ParametersForIOU:
 
     def __init__(self, font_size, family):
         self.colors = (
-            'w', 'xkcd:sky blue', 'xkcd:sky blue'
+            'w', 'xkcd:cerulean', 'xkcd:sky blue'
         )
         self.rc_font = {
             'size': font_size, 'family': family
         }
 
 def to_intersections_and_unions(
-    choice_ratio, listing, add=()
+    choice_ratio, listing, stt_engine, add=()
 ):
     info = find_listing_info(listing)
     figure_id = info["figure"]
@@ -35,7 +36,7 @@ def to_intersections_and_unions(
     ))
     intersections, unions = list(zip(*[
         to_intersection_and_union(
-            listing, clip_id, figure_id, clip_duration, add
+            listing, clip_id, figure_id, clip_duration, stt_engine, add
         )
         for clip_id in clip_ids
     ]))
@@ -43,14 +44,18 @@ def to_intersections_and_unions(
 
 
 def to_intersection_and_union(
-    listing, clip_id, figure_id, clip_duration, add
+    listing, clip_id, figure_id, clip_duration, stt_engine, add
 ):
     L = logging.getLogger(__name__)
     config = load_config(L, Path('config'))
     audio_path = find_audio_file(listing, clip_id)
     transcript = use_speech_to_text_engine(
-        L, config, audio_path, stt_engine="deepgram"
+        L, config, audio_path, stt_engine=stt_engine
     )
+    if "edits" in add and transcript is not None:
+        transcript = use_llm_proofreader(
+            L, config, transcript
+        )
     if transcript is None:
         L.warning(f'Skipping clip {clip_id} of "{listing}"')
         return 0, 0
@@ -96,7 +101,7 @@ class PlotIOU:
     def __enter__(self):
         fig, (ax0,ax1) = plt.subplots(
             2, gridspec_kw=self.gridspec_kw,
-            layout="constrained", figsize=(8, 8), sharex=False
+            layout="constrained", figsize=(8, 4), sharex=False
         )
         background_color = 3 * (1/10,)
         fig.patch.set_facecolor(background_color)
@@ -108,7 +113,7 @@ class PlotIOU:
         )
         n_clips = len(clip_ids)
         mean_iou = np.mean(iou_vals)
-        width = 0.8
+        width = 0.5
         thickness = (1/20) * (
             max(iou_vals) - min(iou_vals)
         )
@@ -122,11 +127,11 @@ class PlotIOU:
             xmin=0, xmax=clip_ids[-1]+1
         )
         ax1.bar(
-            [x-0.1 for x in clip_ids], unions, width, label="Union",
+            [x-width/2 for x in clip_ids], unions, width, label="Union",
             bottom=0, align="center", color=self.colors[0]
         )
         ax1.bar(
-            clip_ids, intersections, width, label="Intersection",
+            [x+width/2 for x in clip_ids], intersections, width, label="Intersection",
             bottom=0, align="center", color=self.colors[1]
         )
         for ax in [ax0, ax1]:
@@ -169,7 +174,7 @@ class PlotIOU:
             "Automated vs. Real: Intersection and Union",
             color=self.colors[0]
         )
-        ax1.set_ylabel("Total time in seconds", color=self.colors[0])
+        ax1.set_ylabel("Time in seconds", color=self.colors[0])
         ax1_yticks = np.linspace(0, np.max(unions), self.n_y_steps)
         ax1_ylabels = [
             f"{round(seconds)}s" for seconds in ax1_yticks
