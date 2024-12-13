@@ -1,6 +1,6 @@
 import StyleGlobal from "style-global" with { type: "css" };
 import StylePageData from "style-page-data" with { type: "css" };
-import { root, get_info } from "api";
+import { get_root, get_info } from "api";
 import { make_plain } from "api";
 
 class PageData extends HTMLElement {
@@ -30,6 +30,7 @@ class PageData extends HTMLElement {
     const transcript_state = this.getAttribute(
       "transcript_state"
     ).split(" ");
+    const root = await get_root();
     const info = await get_info(
       root, listing, clip_id, transcript_state, 100
     );

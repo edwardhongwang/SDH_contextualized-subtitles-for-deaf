@@ -122,10 +122,20 @@ const get_audio_url = (
   return `${root}/audio/${listing}/${clip_id}/voice.mp3`;
 }
 
-const root = "http://localhost:7777/api";
+const get_root = async () => {
+  const { href } = location;
+  if (location.port == "8888") {
+    const { protocol, hostname } = location;
+    return `${protocol}//${hostname}:7777/api`;
+  }
+  else {
+    return `${href}api`;
+  }
+  return local_root;
+}
 
 export {
-  get_info, index_info, root,
+  get_info, index_info, get_root,
   make_plain, enrich_all,
   enrich_edits, enrich_sounds,
   get_audio_url

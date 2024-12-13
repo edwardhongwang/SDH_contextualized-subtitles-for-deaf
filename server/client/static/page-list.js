@@ -1,6 +1,6 @@
 import StyleGlobal from "style-global" with { type: "css" };
 import StylePageList from "style-page-list" with { type: "css" };
-import { root, index_info } from "api";
+import { get_root, index_info } from "api";
 
 class PageList extends HTMLElement {
 
@@ -20,7 +20,7 @@ class PageList extends HTMLElement {
     this.shadowRoot.innerHTML = "";
     const template = document.getElementById("page-list-view");
     const copy = template.content.cloneNode(true);
-    const info_index = await(index_info(root));
+    const info_index = await(index_info(await get_root()));
     info_index.forEach(info => {
       const info_el = document.createElement("nested-list");
       info_el.setAttribute("clip_count", info.clip_count);
