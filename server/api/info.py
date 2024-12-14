@@ -11,6 +11,7 @@ from data_utils import (
     trim_listing_name
 )
 from utils import load_config
+from src import InfoError
 
 
 class InfoLine(BaseModel):
@@ -21,6 +22,8 @@ class InfoLine(BaseModel):
     clip_count: int 
     figure: Optional[int]
 
+    def json_serialized(self):
+        return self.model_dump() 
 
 class InfoIndex(RootModel):
     root: List[InfoLine]
@@ -31,9 +34,8 @@ class InfoIndex(RootModel):
     def __getitem__(self, item):
         return self.root[item]
 
-
-class InfoError(Exception):
-    pass
+    def json_serialized(self):
+        return self.model_dump() 
 
 
 def to_info_line(listing):
@@ -57,9 +59,16 @@ class InfoFinder:
     def __init__(self):
         pass
 
-    def __call__(self, listing: str):
+    def __call__(
+        self, listing: str
+    ):
+        self.listing = listing
+        return (x for x in self)
+
+    def __iter__(self):
+        listing = self.listing
         try:
-            return to_info_line(listing)
+            yield to_info_line(listing)
         except FileNotFoundError:
             raise InfoError()
 
@@ -72,17 +81,22 @@ class InfoIndexer:
     def __call__(
         self, listings=Depends(find_audio_listings)
     ):
+        self.listings = listings
+        return (x for x in self)
+
+    def __iter__(self):
+        listings = self.listings
         info_index = []
         for listing in listings:
             info_index.append(to_info_line(listing)) 
-        return InfoIndex(info_index)
+        yield InfoIndex(info_index)
 
 
 def list_figures():
     figure_list = []
     listings = find_audio_listings()
     try:
-        info_index = InfoIndexer()(listings)
+        info_index = next(InfoIndexer()(listings))
     except InfoError:
         return figure_list
     for idx in info_index:

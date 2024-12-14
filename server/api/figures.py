@@ -10,6 +10,7 @@ from .transcripts import find_listing
 from .transcripts import TranscriptMaker
 from data_utils import find_figure_label_folder
 from data_utils import find_listing_info
+from src import TranscriptError 
 import matplotlib.pyplot as plt
 import matplotlib
 matplotlib.use('AGG')
@@ -51,7 +52,8 @@ def generate_figure(
     )
     label_dict = OrderedDict()
     label_dict["Automated speech timings"] = vectorize_transcript(
-        transcript, timedelta(seconds=0), end_time - start_time
+        transcript.model_dump(), timedelta(seconds=0),
+        end_time - start_time
     )
     if figure_id:
         label_dict["Real speech timings"] = load_labels(
@@ -69,18 +71,28 @@ class FigureMaker:
         self.maker = TranscriptMaker(add=add)
 
     def __call__(self, listing: str, clip_id: int):
+        self.listing = listing
+        self.clip_id = clip_id
+        return (x for x in self)
+
+    def __iter__(self):
+        listing = self.listing
+        clip_id = self.clip_id
         info = find_listing_info(listing)
         audio_path = find_listing(listing, clip_id)
         if not audio_path.is_file():
-            raise TranscriptError()
-        transcript = self.maker(listing, clip_id)
+            raise FigureError()
+        try:
+            transcript = next(self.maker(listing, clip_id))
+        except TranscriptError:
+            raise FigureError()
         duration = info.get("clip_duration", None)
         clip_count = info.get("clip_count", 1)
         figure_id = info.get("figure", None)
         if clip_id >= clip_count:
             raise FigureError()
         # Sound labels and waveform
-        return generate_figure(
+        yield generate_figure(
             find_figure_label_folder(), transcript, audio_path,
             figure_id, clip_id, duration 
         )

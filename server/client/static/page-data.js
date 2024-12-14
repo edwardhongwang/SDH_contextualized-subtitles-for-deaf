@@ -89,6 +89,7 @@ class PageData extends HTMLElement {
         this.setAttribute("speaker_src", "");
         nav_el.setAttribute("actions", "");
         this.setAttribute("lines", JSON.stringify([]));
+        const root = await get_root();
         const lines = await make_plain(
           root, listing, clip_id
         );
@@ -124,6 +125,7 @@ class PageData extends HTMLElement {
         const old_transcript_state = this.getAttribute(
           "transcript_state"
         ).split(" ");
+        const root = await get_root();
         const { lines, transcript_state } = await detail.api_method(
           root, listing, clip_id, transcript, old_transcript_state
         );

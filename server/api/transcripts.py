@@ -3,6 +3,7 @@ import logging
 from pathlib import Path
 from datetime import timedelta
 from functools import lru_cache 
+from pydantic import field_serializer
 from pydantic import BaseModel
 from pydantic import RootModel
 from typing import List
@@ -12,6 +13,7 @@ from src import use_llm_proofreader
 from src import use_sound_describer
 from utils import parse_srt, format_srt, load_config
 from data_utils import find_audio_file
+from src import TranscriptError 
 
 
 class TranscriptLine(BaseModel):
@@ -19,6 +21,13 @@ class TranscriptLine(BaseModel):
     end_time: timedelta 
     index: int
     text: str
+
+    def json_serialized(self):
+        return {
+            **self.model_dump(),
+            "start_time": self.start_time.total_seconds(),
+            "end_time": self.end_time.total_seconds(),
+        }
 
 
 class Transcript(RootModel):
@@ -30,19 +39,20 @@ class Transcript(RootModel):
     def __getitem__(self, item):
         return self.root[item]
 
-
-class ListingError(Exception):
-    pass
+    def json_serialized(self):
+        return [
+            t.json_serialized() for t in self
+        ]
 
 
 @lru_cache
 def find_listing(listing, clip_id):
     if not listing or clip_id is None:
-        raise ListingError()
+        raise TranscriptError()
     listing_name = Path(listing).resolve().parts[-1]
     audio_path = find_audio_file(listing_name, clip_id)
     if not audio_path.is_file():
-        raise ListingError()
+        raise TranscriptError()
     # Return audio path
     return audio_path
 
@@ -79,7 +89,16 @@ class TranscriptMaker:
     def __init__(self, add:set[str]):
         self.need = lambda key: key in add
 
-    def __call__(self, listing: str, clip_id: int):
+    def __call__(
+        self, listing: str, clip_id: int
+    ):
+        self.listing = listing
+        self.clip_id = clip_id
+        return (x for x in self)
+
+    def __iter__(self):
+        listing = self.listing
+        clip_id = self.clip_id
         audio_path = find_listing(listing, clip_id)
         # Handle creation from scratch
         transcript = make_new_transcript(audio_path)
@@ -88,9 +107,9 @@ class TranscriptMaker:
         if self.need("sounds"):
             transcript = add_sounds(transcript, audio_path)
         # Return transcript
-        return parse_srt(
+        yield Transcript(parse_srt(
             transcript
-        )
+        ))
 
 
 class TranscriptEnricher:
@@ -101,6 +120,15 @@ class TranscriptEnricher:
     def __call__(
         self, listing: str, clip_id: int, transcript: Transcript
     ):
+        self.listing = listing
+        self.clip_id = clip_id
+        self.transcript = transcript
+        return (x for x in self)
+
+    def __iter__(self):
+        listing = self.listing
+        clip_id = self.clip_id
+        transcript = self.transcript
         audio_path = find_listing(listing, clip_id)
         # Serialize transcript
         transcript = format_srt(transcript.model_dump())
@@ -110,9 +138,9 @@ class TranscriptEnricher:
         if self.need("sounds"):
             transcript = add_sounds(transcript, audio_path)
         # Return transcript
-        return parse_srt(
+        yield Transcript(parse_srt(
             transcript
-        )
+        ))
 
 
 # Possible transcript initializations

@@ -5,7 +5,7 @@ const make_plain = async (root, listing, clip_id) => {
   return (
     await (
       await fetch(
-        `${root}/make/${listing_path}`
+        `${root}api/make/${listing_path}`
       )
     ).json()
   )
@@ -21,14 +21,26 @@ const enrich = (transcript_state) => {
     const listing_path = get_listing_path(
       listing, clip_id, old_transcript_state, must_add
     );
-    const lines = (
-      await (await fetch(`${root}/enrich/${listing_path}`, {
-        method: "POST", body: JSON.stringify(transcript),
-        headers: {
-          "Content-Type": "application/json",
-        }
-      })).json()
-    )
+    let lines = []
+    if (location.port == "8888") {
+      lines = (
+        await (await fetch(`${root}api/enrich/${listing_path}`, {
+          method: "POST", body: JSON.stringify(transcript),
+          headers: {
+            "Content-Type": "application/json",
+          }
+        })).json()
+      )
+    }
+    else {
+      lines = (
+        await (
+          await fetch(
+          `${root}api/enrich/${listing_path}`
+          )
+        ).json()
+      )
+    }
     return {
       lines, transcript_state
     }
@@ -43,7 +55,7 @@ const enrich_sounds = enrich([ "sounds" ]);
 
 const index_info = async (root) => {
   const info_index = (
-    await (await fetch(`${root}/index/info`)).json()
+    await (await fetch(`${root}api/index/info`)).json()
   )
   return info_index.map(info => {
     const { listing, label, clip_count } = info;
@@ -55,7 +67,7 @@ const get_info = async (
   root, listing, clip_id, transcript_state, width
 ) => {
   const info = (
-    await (await fetch(`${root}/info/${listing}`)).json()
+    await (await fetch(`${root}api/info/${listing}`)).json()
   )
   const parse = await get_entity(info.speaker.split('/').pop());
   const { displaytitle } = parse;
@@ -102,7 +114,7 @@ const get_figure_image = async (
   const listing_path = get_listing_path(
     listing, clip_id, transcript_state, []
   );
-  return `${root}/figure/${listing_path}/figure.png`;
+  return `${root}api/figure/${listing_path}/figure.png`;
 }
 
 const get_listing_path = (
@@ -119,17 +131,17 @@ const get_listing_path = (
 const get_audio_url = (
   root, listing, clip_id
 ) => {
-  return `${root}/audio/${listing}/${clip_id}/voice.mp3`;
+  return `${root}data/${listing}/${clip_id}/voice.mp3`;
 }
 
 const get_root = async () => {
   const { href } = location;
   if (location.port == "8888") {
     const { protocol, hostname } = location;
-    return `${protocol}//${hostname}:7777/api`;
+    return `${protocol}//${hostname}:7777/`;
   }
   else {
-    return `${href}api`;
+    return href;
   }
   return local_root;
 }

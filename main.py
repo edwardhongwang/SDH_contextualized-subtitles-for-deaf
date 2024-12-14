@@ -8,6 +8,7 @@ from pathlib import Path
 from fractions import Fraction
 from server import run_servers, list_figures
 from data_utils import to_server_constants
+from data_utils import should_server_export
 from utils import find_test_sets, run_tests
 from utils import extract_audio_from_video
 from utils import setup_logger, load_config
@@ -39,8 +40,11 @@ def parse_arguments(L, config, test_commands):
         description="Video subtitle generator", add_help=False
     )
     subparsers = parser.add_subparsers(metavar="command", dest="command")
-    subparsers.add_parser("serve", help="run web server")
-
+    # Subcommand "serve"
+    serve_parser = subparsers.add_parser("serve", help="run web server")
+    serve_parser.add_argument(
+        "--export", action='store_true' 
+    )
     # Subcommand "iou"
     figure_list = list_figures()
     figure_list_string = ", or ".join(
@@ -142,6 +146,7 @@ def run_main(config):
         return run_tests(args.test_sets)
     elif args.command == "serve":
         # Run web servers
+        should_server_export(args.export)
         constants = to_server_constants()
         asyncio.run(run_servers(
             constants.get("api", {})["port"],

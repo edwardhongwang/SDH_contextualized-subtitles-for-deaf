@@ -12,3 +12,7 @@ class AudioExtractionError(Exception):
 
 class UncategorizedError(Exception):
     pass
+
+
+class InfoError(Exception):
+    pass

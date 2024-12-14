@@ -30,3 +30,5 @@ figures/TVSM-*
 figures/__MACOSX
 # Keep figure files
 !server/api/**/*.mp3
+# Keep exported artifacts
+!server/client/data/**/*.mp3
