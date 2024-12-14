@@ -73,7 +73,9 @@ export default {
       },{
         src: 'api/index/info', dest: 'dist/api/index',
         transform: (content) => JSON.stringify(
-          JSON.parse(content).map(update_info)
+          JSON.parse(content).map(update_info).filter(
+            info => info.clip_count > 0
+          )
         )
       },{
         src: 'data', dest: 'dist'
