@@ -4,5 +4,6 @@ description = "Subtitles for the deaf and hard of hearing"
 version = "0.1.0"
 authors = [
     { name = "John Hoffer" },
-    { name = "Edward Hong Wang" }
+    { name = "Edward Hong Wang" },
+    { name = "Cynthia Wen" }
 ]
