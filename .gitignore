@@ -5,6 +5,8 @@ __pycache__/
 *.log
 .DS_Store
 deepgram-python-captions/
+server/client/node_modules
+server/client/dist
 
 *.mp4
 *.mp3

@@ -1,0 +1,24 @@
+html, body {
+  padding: 0;
+  margin: 0;
+}
+body {
+  display: grid;
+  padding: 2em 1em;
+  justify-items: center;
+  color: hwb(var(--light));
+  grid-template-rows: auto auto;
+  font-family: var(--font-content);
+  grid-template-columns: 1fr min(100%, 800px) 1fr;
+  background-color: hwb(var(--deep-black));
+  align-content: space-between;
+  min-height: 80vh;
+  gap: 40px 0; 
+  > * {
+    grid-column: 2;
+    grid-row: 1;
+  }
+  > .footer {
+    grid-row: 2;
+  }
+}
