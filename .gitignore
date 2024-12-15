@@ -5,6 +5,8 @@ __pycache__/
 *.log
 .DS_Store
 deepgram-python-captions/
+server/client/node_modules
+server/client/dist
 
 *.mp4
 *.mp3
@@ -30,3 +32,5 @@ figures/TVSM-*
 figures/__MACOSX
 # Keep figure files
 !server/api/**/*.mp3
+# Keep exported artifacts
+!server/client/data/**/*.mp3

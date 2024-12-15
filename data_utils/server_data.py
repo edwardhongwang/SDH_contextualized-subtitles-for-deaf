@@ -3,6 +3,16 @@ from pathlib import Path
 import yaml
 
 
+SHOULD_SERVER_EXPORT = False
+
+
+def should_server_export(export=None):
+    global SHOULD_SERVER_EXPORT
+    if export != None:
+        SHOULD_SERVER_EXPORT = export
+    return SHOULD_SERVER_EXPORT
+
+
 @lru_cache
 def to_server_constants():
     return yaml.safe_load(open(
@@ -23,7 +33,7 @@ def trim_listing_name(listing):
 @lru_cache
 def find_listing_info(listing):
     audio_root = find_audio_root_folder()
-    listing_name = trim_listing_name(listing) 
+    listing_name = trim_listing_name(listing)
     folder = audio_root / listing_name
     return (
         yaml.safe_load(open(folder / "info.yaml"))

@@ -1,0 +1,39 @@
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+on:
+  workflow_dispatch:
+jobs:
+  deploy:
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 9
+      - name: Use Node.js 20
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20.x'
+          cache-dependency-path: server/client/pnpm-lock.yaml
+          cache: 'pnpm'
+      - name: Install dependencies
+        working-directory: server/client
+        run: pnpm install
+      - name: Build with rollow
+        working-directory: server/client
+        run: pnpm run build --if-present
+      - name: Setup Pages
+        uses: actions/configure-pages@v5
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: './server/client/dist'
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4

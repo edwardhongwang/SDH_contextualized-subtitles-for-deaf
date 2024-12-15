@@ -1,6 +1,6 @@
 import StyleGlobal from "style-global" with { type: "css" };
 import StylePagePane from "style-page-pane" with { type: "css" };
-import { root, get_audio_url } from "api";
+import { get_root, get_audio_url } from "api";
 
 class PagePane extends HTMLElement {
 
@@ -33,6 +33,7 @@ class PagePane extends HTMLElement {
     h2_el.innerText = this.getAttribute("label");
     h4_el.innerText = this.getAttribute("header");
     a_el.innerText = clip_id;
+    const root = await get_root();
     a_el.setAttribute(
       "href", get_audio_url(root, listing, clip_id)
     );

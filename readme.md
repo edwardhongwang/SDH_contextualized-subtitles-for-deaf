@@ -97,6 +97,12 @@ python main.py --input audio.mp3 --output subtitles.srt
 python main.py serve
 ```
 
+or
+
+```bash
+python main.py serve --export
+```
+
 ### Creating IOU plots
 
 ```bash

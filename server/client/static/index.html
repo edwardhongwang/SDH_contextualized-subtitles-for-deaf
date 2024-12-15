@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title> HIContext </title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="apple-mobile-web-app-title" content="HIContext" />
+    <link rel="icon" type="image/png" href="/favicon-96x96.png" sizes="96x96" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="shortcut icon" href="/favicon.ico" />
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
+    <link rel="manifest" href="/site.webmanifest" />
+    <script type="importmap">
+      {
+        "imports": {
+          "api": "./api.js",
+          "index": "./index.js",
+          "styles": "./styles.js",
+          "page-wrapper": "./page-wrapper.js",
+          "style-page-wrapper": "./page-wrapper.css",
+          "page-root": "./page-root.js",
+          "style-page-root": "./page-root.css",
+          "nested-list": "./nested-list.js",
+          "style-nested-list": "./nested-list.css",
+          "nested-item": "./nested-item.js",
+          "style-nested-item": "./nested-item.css",
+          "page-list": "./page-list.js",
+          "style-page-list": "./page-list.css",
+          "page-data": "./page-data.js",
+          "style-page-data": "./page-data.css",
+          "page-pane": "./page-pane.js",
+          "style-page-pane": "./page-pane.css",
+          "page-nav": "./page-nav.js",
+          "style-page-nav": "./page-nav.css",
+          "line-list": "./line-list.js",
+          "style-line-list": "./line-list.css",
+          "sound-counts": "./sound-counts.js",
+          "style-global": "./global.css",
+          "style-layout": "./layout.css",
+          "style-fonts": "./fonts.css"
+        }
+      }
+    </script>
+    <script type="module">
+      import { index } from 'index';
+      index();
+    </script>
+
+  </head>
+  <body>
+    <page-wrapper><page-wrapper>
+    <div class="footer">© 2024</div>
+    <template id="page-wrapper-view">
+      <page-list empty></page-list>
+    </template>
+    <template id="page-root-view">
+    </template>
+    <template id="page-data-view">
+      <page-pane></page-pane>
+      <page-nav actions="main edits sounds new"></page-nav>
+    </template>
+    <template id="page-pane-view">
+      <div>
+        <h2></h2>
+        <a></a>
+        <h4></h4>
+        <img src="">
+        <line-list></line-list>
+      </div>
+    </template>
+    <template id="page-nav-view">
+      <button id="main">
+        <span>Full SDH</span>
+      </button>
+      <button id="edits">
+        <span>Proofread</span>
+        <span>Speech</span>
+      </button>
+      <button id="sounds">
+        <span>Describe</span>
+        <span>Sounds</span>
+      </button>
+      <button id="emotions">
+        <span>Detect</span>
+        <span>Emotions</span>
+      </button>
+      <button id="undo">
+        <span>Undo</span>
+      </button>
+      <button id="new">
+        <span>New</span>
+      </button>
+    </template>
+    <template id="page-list-view">
+      <button>Back</button>
+    </template>
+    <template id="nested-list-view">
+      <details>
+        <summary></summary>
+        <div></div>
+      </details>
+    </template>
+  </body>
+</html>

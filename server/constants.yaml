@@ -1,5 +1,7 @@
 api:
   port: 7777
+  export: True
+  export_root: "server/client"
   audio_root: "server/api/data"
   figure_root: "server/api/figures"
 client:

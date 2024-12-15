@@ -6,7 +6,6 @@
   grid-column: 1 / -2;
   min-width: var(--pane-min);
   grid-template-columns: 1fr;
-  padding-top: var(--gap-big);
   min-height: calc(2*var(--pane-tall)/3);
   height: var(--pane-tall);
   > div {
@@ -30,6 +29,7 @@
       grid-row: 1;
       grid-column: 1 / -1;
       align-self: center;
+      text-align: center;
     }
     > a {
       grid-row: 2;

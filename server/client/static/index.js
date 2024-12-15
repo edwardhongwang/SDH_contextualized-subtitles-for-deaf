@@ -7,6 +7,8 @@ import { PageRoot } from "page-root";
 import { PageData } from "page-data";
 import { PagePane } from "page-pane";
 import { PageNav } from "page-nav";
+import { styles } from "styles";
+
 
 const valid_events = new Set([
   "srt-pages/select",
@@ -16,6 +18,7 @@ const valid_events = new Set([
 ])
 
 const index = (user) => {
+  styles();
   // Wrapper
   customElements.define(
     "page-wrapper", eventReceiver(

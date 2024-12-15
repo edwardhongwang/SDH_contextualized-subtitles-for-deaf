@@ -29,12 +29,13 @@ def use_speech_to_text_engine(
             )
         except (FileNotFoundError, APIError, TranscriptError) as e:
             L.error(e)
-            return None
+            return ""
     elif stt_engine == "groq":
         return transcriber.transcribe_groq(
             audio_path
         )
     L.error(f'Unknown STT Engine: "{stt_engine}"')
+    return ""
 
 
 def use_llm_proofreader(

@@ -23,7 +23,7 @@
     > div {
       display: grid;
       gap: var(--gap-small);
-      grid-template-columns: 5em 1fr;
+      grid-template-columns: auto 1fr;
       > span.nonlinguistic {
         color: hwb(var(--light-focus));
       }

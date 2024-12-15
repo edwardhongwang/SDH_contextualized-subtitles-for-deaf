@@ -3,6 +3,7 @@
   display: grid;
   justify-self: start;
   grid-auto-rows: 1fr;
+  padding-bottom: var(--gap-average);
   grid-template-columns: repeat(
     auto-fill, minmax(var(--nav-wide), 1fr)
   );

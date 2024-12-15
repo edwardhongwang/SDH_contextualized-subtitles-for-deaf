@@ -13,8 +13,9 @@ Client-side single page app
 
 @sdh_client.get("/")
 async def open_root_html():
-    return FileResponse(ROOT / 'index.html')
+    return FileResponse(ROOT / 'static' / 'index.html')
+
 
 sdh_client.mount(
-    "/static", StaticFiles(directory=ROOT / "static"), name="static"
+    "/", StaticFiles(directory=ROOT / "static"), name="static"
 )
